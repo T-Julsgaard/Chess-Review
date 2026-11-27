@@ -79,7 +79,12 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
         }
         if (page === 0 && lines === 2) evidence.push({label, zoom: data.zoom, nameFont: +data.nameFont.toFixed(1)});
         if (page === 0 && lines === 2 && scale === 1.25) await shot(`overview-${label}`);
-        if (page === 0 && lines !== 2) await shot(`accuracy-${label}-${lines}`, {x: data.accuracy.x, y: data.accuracy.y, width: data.accuracy.w, height: data.accuracy.h});
+        // Crops show the settled page: after the page turn's leaf and the overview's reveal.
+        if (page === 0 && lines !== 2) {
+          await waitFor(review, "!document.querySelector('[data-mod=accuracy] :is(.acc-turn-leaf,.acc-reveal-slot)')", 'Accuracy page turn and reveal');
+          await sleep(150); await frames();
+          await shot(`accuracy-${label}-${lines}`, {x: data.accuracy.x, y: data.accuracy.y, width: data.accuracy.w, height: data.accuracy.h});
+        }
       }
     }
     // Rail buttons stay clear of the floating Feedback button (after the rail's glide settles).
@@ -136,7 +141,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     for (const [i, id] of ids.entries()) {
       await run(`w.go(${i})`); await sleep(120); await frames();
       const data = await run(`(()=>{const R=${rect},shell=document.querySelector('.profile-shell'),host=shell.querySelector('.profile-slide-host'),story=host.querySelector('.pv-story');
-        const lead=story?.querySelector('.pv-story-lead,.pv-points li,.pv-fact dt,.pv-reasons li');
+        const lead=story?.querySelector('.pv-story-lead,.pv-points li,.pv-fact dt,.pv-reasons li,.profile-share .profile-chooser-row .profile-button');
         const zoom=Number(story?.style.zoom||1),s=R(shell).w/shell.offsetWidth;
         return {shell:R(shell),board:R(w.liveBoard),zoom,font:lead?parseFloat(getComputedStyle(lead).fontSize)*zoom*s:null,
           scrollbars:${SCROLLBARS}(shell).filter(b=>!/pv-cmp-list|pv-filter|pv-modes|pv-compare-menu|pv-settings-menu|profile-suggest/.test(b.cls))};})()`);
@@ -146,7 +151,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       if (data.shell.x > data.board.r && (data.shell.y < data.board.y - 1 || data.shell.b > data.board.b + 1)) fail(label, `Playstyle ${id}: panel taller than the board`, data);
       if (data.font != null && data.font < 9) fail(label, `Playstyle ${id}: text too small (${data.font.toFixed(1)}px)`, data);
       profileEvidence.push({label, id, zoom: +data.zoom.toFixed(2), font: data.font && +data.font.toFixed(1)});
-      if (scale === 1.5 && ['numbers', 'openings', 'signature', 'rating', 'share'].includes(id)) await shot(`profile-${label}-${id}`);
+      // Shots show the settled chapter, after its figures count up and its rows rise in.
+      if (scale === 1.5 && ['numbers', 'openings', 'signature', 'rating', 'share'].includes(id)) { await sleep(1600); await frames(); await shot(`profile-${label}-${id}`); }
     }
   }
   return finish(profileEvidence);

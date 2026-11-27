@@ -113,3 +113,6 @@
 .stage.engine-fit-motion .mod:is([data-mod="accuracy"],[data-mod="engine"]) > .mod-inner {
   transition:top .28s cubic-bezier(.22,.8,.24,1), height .28s cubic-bezier(.22,.8,.24,1);
 }
+/* A new line is drawn before Engine has finished growing to it: clip the body
+   during the glide instead of flashing a scroll bar. */
+.stage.engine-fit-motion .mod[data-mod="engine"] > .mod-inner .panel .engine-body { overflow:hidden; }

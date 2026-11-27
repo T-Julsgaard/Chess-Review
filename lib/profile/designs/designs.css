@@ -585,3 +585,18 @@
 .profile-shell.profile-tiny .pv-wdl { height: 42px; }
 .profile-shell.profile-tiny .profile-nav.pv-story-nav { padding: 4px 12px 8px; }
 .profile-shell.profile-tiny .pv-story-nav > :is(.pv-next, .pv-prev) { min-height: 36px; padding-block: 3px; }
+/* The last chapter: in a fitted panel the mini-me gives way first (he draws to any
+   height), so the note and the buttons keep their size instead of the chapter
+   zooming out. Short panels also close up the spacing around them. */
+.profile-slide-fit .profile-share .profile-minime { min-height: 120px; }
+.profile-shell.profile-short .pv-share-results { padding-top: 8px; }
+.profile-shell.profile-short .pv-share-results > .profile-share-results { min-height: 42px; padding-block: 9px; }
+.profile-shell.profile-short .pv-share-results + .profile-share:has(> .profile-dev:first-child) { margin-top: 12px; padding-top: 18px; }
+.profile-shell.profile-short .profile-dev + .profile-chooser-row { padding-top: 12px; }
+.profile-shell.profile-tiny .profile-slide-fit .profile-share .profile-minime { min-height: 96px; }
+.profile-shell.profile-tiny .pv-share-results { padding-top: 4px; }
+.profile-shell.profile-tiny .pv-share-results > .profile-share-results { min-height: 38px; padding-block: 7px; font-size: 15px; }
+.profile-shell.profile-tiny .pv-share-results + .profile-share:has(> .profile-dev:first-child) { margin-top: 8px; padding-top: 10px; }
+.profile-shell.profile-tiny .profile-type-screen { font-size: 14px; }
+.profile-shell.profile-tiny .profile-dev + .profile-chooser-row { padding-top: 8px; }
+.profile-shell.profile-tiny .pv-story .profile-share .profile-chooser-row .profile-button { min-height: 34px; }

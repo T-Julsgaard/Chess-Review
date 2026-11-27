@@ -32,11 +32,14 @@ boxes share one size; the dials take the height left over, from the desktop size
 down to a minimum, below which only their figures remain. Quality tightens its
 rows, and only a small remainder is zoomed. Sub-pixel remainders at fractional
 scaling are hidden rather than drawing a scroll bar. Advanced is a long list and
-keeps its own scrolling. Playstyle chapters are fitted to their panel rather than
-scrolled. Beside the board the panel always spans exactly the squares' height;
-short panels tighten the header, chapter rows and buttons (two steps) before the
-chapter is scaled. When the floating Feedback button would still touch the
-section rail after tucking to its icon, the rail ends just above it.
+keeps its own scrolling. When a new engine line makes Engine taller, its body is
+clipped during the glide rather than flashing a scroll bar. Playstyle chapters
+are fitted to their panel rather than scrolled. Beside the board the panel always
+spans exactly the squares' height; short panels tighten the header, chapter rows
+and buttons (two steps) before the chapter is scaled; in the last chapter the
+mini-me figure gives way first, so the note and buttons keep their size. When the
+floating Feedback button would still touch the section rail after tucking to its
+icon, the rail ends just above it.
 
 Desktop page bounds stay fixed when Accuracy expands; content extending beyond
 the viewport is clipped. Panel bodies can still scroll. Narrow and short windows
@@ -91,7 +94,8 @@ Run these against the working tree in an isolated Chrome extension profile:
   with dials over their columns, coach clear of the explanations switch (also in
   stacked layouts), rail clear of Feedback, and every Playstyle chapter shown
   without scrolling, within the board's height. It saves an Accuracy panel crop
-  per viewport. `LAPTOP_FIT_ONLY=review` or `=profile` runs one half.
+  per viewport and Playstyle shots, both after their animations settle.
+  `LAPTOP_FIT_ONLY=review` or `=profile` runs one half.
 - `--viewport-preview` checks the live Screen sizes viewer, rotation, fullscreen,
   and isolation from saved user data.
 
