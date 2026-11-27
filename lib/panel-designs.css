@@ -136,9 +136,9 @@
 .accuracy-phase-report .acc-page-overview .phase-overview { gap: 10px; }
 .accuracy-phase-report-2 .acc-page-overview .phase-overview { gap: 8px; }
 .accuracy-phase-modern .acc-page-overview .phase-overview { gap: 5px; }
-/* Share spare height across all four gaps, including above and below the names. */
-.accuracy-phase-modern .acc-page-overview .acc-fit-content::before { content: ''; flex: 1 0 0; }
-.accuracy-phase-modern .acc-page-overview .phase-overview { flex: 3 0 auto; }
+/* Spare height goes below the names and between the score sections, never above
+   the names: they stay at the same height on every Accuracy page. */
+.accuracy-phase-modern .acc-page-overview .phase-overview { flex: 1 0 auto; }
 .accuracy-phase-modern .acc-page-overview .phase-overview::before { content: ''; flex: none; }
 /* Scrollable post-game comparisons keep the overview's player columns. */
 .stage .accuracy-phase-modern .acc-page-advanced { display: flex; flex-direction: column; }

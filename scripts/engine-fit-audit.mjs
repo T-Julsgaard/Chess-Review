@@ -78,9 +78,11 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       const [three, two, one] = sizes, gap = three.engine.top-three.accuracy.bottom;
       const fullSize=sizes.filter(s=>s.accuracyZoom===1&&!s.accuracyCompact);
       for (const fit of fullSize) {
-        const extra=fit.allGaps.map((value,i)=>value-fullSize[0].allGaps[i]);
+        const [names,...extra]=fit.allGaps.map((value,i)=>value-fullSize[0].allGaps[i]);
+        // The names keep their place on every Accuracy page, so nothing grows above them.
+        assert.ok(Math.abs(names)<.5, 'Spare Accuracy height never goes above the names '+JSON.stringify({design,width,height,names}));
         assert.ok(Math.max(...extra)-Math.min(...extra)<.5,
-          'Spare Accuracy height is shared below navigation, below names and between score sections '+JSON.stringify({design,width,height,extra}));
+          'Spare Accuracy height is shared below names and between score sections '+JSON.stringify({design,width,height,extra}));
       }
       for (const fit of sizes) {
         const context = JSON.stringify({design, width, height, gap, fit});
