@@ -122,6 +122,42 @@ test('the Hint button sits beside Exit and works before any attempt; the coach a
   assert.equal(doc.querySelector('.sq.hint-from'),null);
 });
 
+test('Hint fills halfway and lights the piece, then fills fully and draws the move arrow',t=>{
+  const a=practice(t),doc=a.dom.window.document;
+  a.state.settings.bestArrow=false;   // the second hint step shows its arrow regardless
+  a.call('renderControls');
+  const hint=doc.querySelector('#controls .practice-hint'),arrow=()=>doc.querySelector('.board svg.best-arrow');
+  assert.equal(hint.dataset.level,'0');
+  hint.click();
+  assert.equal(hint.dataset.level,'1');
+  assert.equal(a.run('sqByName.e2').classList.contains('hint-from'),true);
+  assert.equal(arrow(),null,'the first hint shows only the piece');
+  hint.click();
+  assert.equal(hint.dataset.level,'2');
+  assert.equal(a.run('sqByName.e2').classList.contains('hint-from'),true);
+  assert.ok(arrow()?.querySelector('polyline'),'the second hint draws the arrow');
+  hint.click();
+  assert.equal(hint.dataset.level,'2');
+  assert.equal(doc.querySelectorAll('.board svg.best-arrow').length,1);
+  a.call('practiceAttempt','e2','e4');
+  assert.equal(hint.dataset.level,'0');
+  assert.equal(arrow(),null);
+});
+
+test('Hint pressed twice during the roll queues both steps for the player\'s turn',t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const a=practice(t),doc=a.dom.window.document;
+  a.state.practice.solving=false;a.state.idx=0;a.call('renderControls');
+  a.call('practiceRoll',0,()=>a.call('practiceEnterSolve'));
+  const hint=doc.querySelector('#controls .practice-hint');
+  hint.click();hint.click();hint.click();
+  assert.equal(hint.dataset.level,'2');
+  for(const ms of [650,760,780])t.mock.timers.tick(ms);
+  assert.equal(a.state.practice.solving,true);
+  assert.equal(a.state.practiceHint.level,2);
+  assert.ok(doc.querySelector('.board svg.best-arrow'));
+});
+
 test('Hint pressed during the roll or mistake replay lights the piece once it is the player\'s turn',t=>{
   t.mock.timers.enable({apis:['setTimeout']});
   const a=practice(t),doc=a.dom.window.document;

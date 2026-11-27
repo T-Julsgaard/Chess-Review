@@ -1503,7 +1503,38 @@ button { font-family: inherit; cursor: pointer; }
 /* Hint sits beside Exit; lit (accent) while the hint is showing or queued for the next turn. */
 /* (#controls so it outranks the layout presets' `.stage.… .controls button` rules.) */
 #controls .practice-hint { padding: 0 12px; font-weight: 700; font-size: 13px; white-space: nowrap; }
-#controls .practice-hint.on { color: var(--accent); border-color: var(--accent); background: color-mix(in oklab, var(--accent) 18%, var(--panel-2)); }
+#controls .practice-hint.on { color: var(--accent); border-color: var(--accent); }
+/* The button fills like liquid: halfway after the first hint (piece), full after the second
+   (arrow). ::before is the liquid, ::after the wave crest riding its surface; each level uses its
+   own keyframes name so the wave replays on every press. */
+#controls .practice-hint { position: relative; overflow: hidden; isolation: isolate; --hint-fill: 0%; }
+#controls .practice-hint[data-level="1"] { --hint-fill: 50%; }
+#controls .practice-hint[data-level="2"] { --hint-fill: 100%; }
+#controls .practice-hint::before,
+#controls .practice-hint::after {
+  content: ""; position: absolute; left: 0; right: 0; z-index: -1; pointer-events: none;
+  background: color-mix(in oklab, var(--accent) 28%, var(--panel-2));
+  transition: height .5s cubic-bezier(.3,.8,.35,1), bottom .5s cubic-bezier(.3,.8,.35,1);
+}
+#controls .practice-hint::before { bottom: 0; height: var(--hint-fill); }
+#controls .practice-hint::after {
+  bottom: calc(var(--hint-fill) - 1px); height: 6px; opacity: 0;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 6'%3E%3Cpath d='M0 3Q5 0 10 3T20 3V6H0Z'/%3E%3C/svg%3E") 0 0 / 20px 6px repeat-x;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 6'%3E%3Cpath d='M0 3Q5 0 10 3T20 3V6H0Z'/%3E%3C/svg%3E") 0 0 / 20px 6px repeat-x;
+}
+#controls .practice-hint[data-level="1"]::after { animation: hint-wave-1 .6s linear; }
+#controls .practice-hint[data-level="2"]::after { animation: hint-wave-2 .6s linear; }
+@keyframes hint-wave-1 {
+  0%, 75% { opacity: 1; } 100% { opacity: 0; }
+  from { -webkit-mask-position: 0 0; mask-position: 0 0; } to { -webkit-mask-position: -60px 0; mask-position: -60px 0; }
+}
+@keyframes hint-wave-2 {
+  0%, 75% { opacity: 1; } 100% { opacity: 0; }
+  from { -webkit-mask-position: 0 0; mask-position: 0 0; } to { -webkit-mask-position: -60px 0; mask-position: -60px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #controls .practice-hint::before, #controls .practice-hint::after { transition: none; animation: none !important; }
+}
 
 /* ---------- REVIEW SUMMARY ---------- */
 .review {

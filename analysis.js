@@ -2935,17 +2935,24 @@ function renderBestArrow() {
   // While a clicked engine line auto-plays, hide the arrow — its per-position best move often
   // diverges from the line being shown (especially deeper in), which is misleading.
   if (S.lineWalking) { if (svg) svg.remove(); return; }
-  // During mistake practice the arrow would give the answer away → hide it.
-  if (S.practice) { if (svg) svg.remove(); return; }
-  // If the user played the best move themselves (Best/Great/Brilliant), the arrow is redundant;
-  // on a Book move it's meaningless (it's opening theory, not a single "best" move) — so the
-  // arrow isn't shown on the mainline for any of those classifications.
-  const cls = (!S.analysisMode && S.idx > 0) ? S.classif[S.idx] : null;
-  if (cls === "best" || cls === "great" || cls === "brilliant" || cls === "book") { if (svg) svg.remove(); return; }
-  // On the mainline: the best move in the position BEFORE the current one (the alternative to
-  // the played move). In analysis mode: the current position's best move (live). See activeBest().
-  const best = activeBest();
-  const uci = S.settings.bestArrow && best ? best.bestmove : null;
+  // During mistake practice the arrow would give the answer away → hide it, unless the player
+  // pressed Hint a second time, which shows exactly that arrow.
+  let uci;
+  if (S.practice) {
+    const h = S.practiceHint;
+    if (!h || h.level < 2) { if (svg) svg.remove(); return; }
+    uci = h.from + h.to;
+  } else {
+    // If the user played the best move themselves (Best/Great/Brilliant), the arrow is redundant;
+    // on a Book move it's meaningless (it's opening theory, not a single "best" move) — so the
+    // arrow isn't shown on the mainline for any of those classifications.
+    const cls = (!S.analysisMode && S.idx > 0) ? S.classif[S.idx] : null;
+    if (cls === "best" || cls === "great" || cls === "brilliant" || cls === "book") { if (svg) svg.remove(); return; }
+    // On the mainline: the best move in the position BEFORE the current one (the alternative to
+    // the played move). In analysis mode: the current position's best move (live). See activeBest().
+    const best = activeBest();
+    uci = S.settings.bestArrow && best ? best.bestmove : null;
+  }
   if (!uci || uci.length < 4) { if (svg) svg.remove(); return; }
   const a = arrowXY(uci.slice(0, 2)), b = arrowXY(uci.slice(2, 4));
   const headLen = S.settings.arrowHead;
@@ -4026,7 +4033,12 @@ function renderControls() {
     const cur = Math.min(p.i + 1, p.spots.length);
     const position = `Practice ${cur}/${p.spots.length}`;
     if (refs.position.textContent !== position) refs.position.textContent = position;
-    refs.hint.classList.toggle("on", !!(S.practiceHint || p.hintQueued));
+    // The button fills halfway after the first hint step and all the way after the second.
+    const hintLevel = String(Math.max(S.practiceHint?.level || 0, +p.hintQueued || 0));
+    if (refs.hint.dataset.level !== hintLevel) refs.hint.dataset.level = hintLevel;
+    refs.hint.classList.toggle("on", hintLevel !== "0");
+    const hintTitle = hintLevel === "0" ? "Highlight the piece to move" : "Show the move";
+    if (refs.hint.title !== hintTitle) refs.hint.title = hintTitle;
     // Machine-readable phase for tests and screen captures (the bar no longer spells it out).
     const phase = p.rolling ? "rolling" : p.demoing ? "demoing" : p.solving ? "solving" : "solved";
     if (UI.controls.dataset.practice !== phase) UI.controls.dataset.practice = phase;
@@ -6278,13 +6290,13 @@ function focusedEnginePanel(content, {locked = false, playable = false} = {}) {
 // While solving a practice position, the engine lines would give the answer away → hide them.
 function renderEnginePractice() {
   if (panelDesign('engine', S.settings) !== 'original') {
-    focusedEnginePanel(el('div', {class: 'engine-empty', role: 'status'}, 'Find the best move — engine lines are hidden until you solve it.'), {locked: true});
+    focusedEnginePanel(el('div', {class: 'engine-empty', role: 'status'}, 'Engine lines are hidden until you solve it.'), {locked: true});
     return;
   }
   UI.engine.replaceChildren(el("div", { class: "panel" },
     el("div", { class: "panel-head" }, el("h3", {}, "Engine"), el("span", { class: "count" }, "Practice")),
     el("div", { class: "panel-body engine-body" },
-      el("div", { class: "engine-empty", role:"status" }, "Find the best move — engine lines are hidden until you solve it.")),
+      el("div", { class: "engine-empty", role:"status" }, "Engine lines are hidden until you solve it.")),
   ));
   fitEnginePanel();
 }
@@ -8305,7 +8317,8 @@ function practiceBeginSolve(solvePos) {
   S.selectedSq = null; S.practiceHint = null;
   paintBoard(); renderEvalBar(); renderPlayers(); renderMoves(); renderGraph();
   renderControls(); renderReview(); renderEngineCurrent();
-  if (p.hintQueued) { p.hintQueued = false; showPracticeHint(); }   // Hint pressed before it was our turn
+  // Hint pressed (once or twice) before it was our turn.
+  if (p.hintQueued) { const steps = +p.hintQueued; p.hintQueued = false; for (let k = 0; k < steps; k++) showPracticeHint(); }
 }
 function practiceAdvance() {
   if (learningWorkspace || profileOwnsBoard()) { deferredPracticeAdvance = true; return; }
@@ -8349,25 +8362,26 @@ function buzzBoard() {
     board.classList.remove("buzz"); practiceBuzzTimers.delete(board);
   }, 420));
 }
-// Reveal the answer for the current practice spot: light up the engine's best move (the piece
-// it starts from + its target square) with the analytical highlight.
+// Reveal the answer for the current practice spot in two steps: the first press lights up the
+// piece to move, the second also draws the arrow to its target square.
 // Pressed while the board is still rolling, replaying the mistake or celebrating a solve, the
-// hint is queued and shown the moment the (next) position is the player's to solve.
+// hint is queued (up to both steps) and shown the moment the (next) position is the player's to solve.
 function showPracticeHint() {
   const p = S.practice; if (!p) return;
-  if (!p.solving) { p.hintQueued = true; renderControls(); return; }
+  if (!p.solving) { p.hintQueued = Math.min(2, (+p.hintQueued || 0) + 1); renderControls(); return; }
+  if (S.practiceHint?.level >= 2) return;
   const solvePos = p.spots[p.i] - 1;
   const best = S.bests[solvePos];
   const uci = best && best.bestmove;
   if (!uci) { toast("No hint available for this position."); return; }
   if (S.coach && !p.hinted) p.coachTyped = false;   // let the coach switch to its after-hint line
   p.hinted = true;
-  S.practiceHint = { from: uci.slice(0, 2), to: uci.slice(2, 4) };
+  S.practiceHint = { from: uci.slice(0, 2), to: uci.slice(2, 4), level: S.practiceHint ? 2 : 1 };
   paintBoard(); renderControls(); renderReview();
 }
-// Paint the practice hint (called from paintBoard so it survives re-renders). The hint just
-// lights up the square of the PIECE to move — same red highlight as a right-clicked square — and
-// nothing else (no destination, no arrow), so it points you at the piece without giving it all away.
+// Paint the practice hint (called from paintBoard so it survives re-renders). The first step just
+// lights up the square of the PIECE to move — same red highlight as a right-clicked square — so it
+// points you at the piece without giving it all away. The second step's arrow is drawn by renderBestArrow.
 function renderPracticeHint() {
   for (const sq of Object.values(sqByName)) sq.classList.remove("hint-from");
   const h = S.practiceHint; if (!h) return;
@@ -8391,7 +8405,7 @@ async function practiceAttempt(from, to, promotion = "q") {
     UI.boardWrap.querySelectorAll('.puzzle-result-badge').forEach(n => {n.parentElement.classList.remove('has-badge');n.remove();});
     p.solving = false;              // lock out further attempts until the next spot
     S.practiceHint = null;
-    renderPracticeHint();           // remove the tint before the success flash can fade
+    renderPracticeHint(); renderBestArrow();   // remove the tint and arrow before the success flash can fade
     S.selectedSq = null; renderSelection();
     // Visually play the correct move so the piece lands on its square and STAYS there for a beat
     // — confirming the answer instead of snapping straight back.
