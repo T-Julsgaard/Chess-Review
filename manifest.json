@@ -92,15 +92,6 @@
         "content-button.css"
       ],
       "run_at": "document_idle"
-    },
-    {
-      "matches": [
-        "https://t-julsgaard.github.io/Chess-Review/profile/*"
-      ],
-      "js": [
-        "profile-viewer-content.js"
-      ],
-      "run_at": "document_idle"
     }
   ],
   "commands": {

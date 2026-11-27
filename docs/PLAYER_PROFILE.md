@@ -36,7 +36,8 @@ another computer; the design decisions are recorded in [PLAYER_PROFILE_PLAN.md](
   exclusion with learning. `tests/profile-workspace.test.mjs`.
 - [x] Stage 6: share â€” `lib/profile/share.js` (deflated base64url payload, sanitised on decode),
   the GitHub Pages viewer in `profile/`, `#p=` handling in both
-  content scripts and `profile-viewer-content.js`, `openProfile` in the background.
+  content scripts, `openProfile` in the background. (0.6.0 dropped the GitHub Pages content
+  script: a new site would make Chrome disable the extension on update until users approve it.)
 - [x] Stage 7: settings (default period, engine budget, bots toggle, storage usage, delete),
   `PRIVACY.md`, `README.md`, this tracker, full test suite, lint and package build.
 
@@ -89,9 +90,9 @@ over 50,000 puzzles) and that Chess Review is free and open source. The month-by
 the link carries its totals (`report.season`, checked by `sharedSeason`). The intro's mosaic travels
 as one result, day and time control per game (`report.mosaic`, `mosaicPayload`/`mosaicRows` in
 `game-map.js`), so shared squares describe a game but do not open one. An accuracy chapter without a
-finished accuracy check has nothing to draw from a link and stays off. When the extension is installed (`profile-viewer-content.js` marks the page) the
-nudges hide and the same link opens the deck with Compare and Settings on the review board.
-Compare switches between the shared report and a saved player. Settings can load the shared
+finished accuracy check has nothing to draw from a link and stays off. The viewer page itself runs no
+extension script, so it always shows the static deck (with its install nudges).
+When a shared profile reaches the review board (the `openProfile` message), Compare switches between the shared report and a saved player. Settings can load the shared
 player's games to apply filters.
 
 ## Changes from the plan, and why
@@ -136,7 +137,7 @@ twenty minutes apart. Tilt check: the next game within two hours. Night: 23:00â€
 - Twin and copy: `lib/profile/archetypes.js`, `deck.js`
 - Engine sample and hosting: `lib/profile/engine-sample.js`, `pgn-source.js`, `preview.js`, `background.js`, `lib/preview-runner.js`
 - Workspace and board: `lib/profile/workspace.js`, `board.js`, `profile.css`; entry in `analysis.js` (`openProfile`)
-- Share: `lib/profile/share.js`, `profile/` (GitHub Pages viewer), `profile-viewer-content.js`, `content.js`, `lichess-content.js`
+- Share: `lib/profile/share.js`, `profile/` (GitHub Pages viewer), `content.js`, `lichess-content.js`
 - Tests: `tests/profile-*.test.mjs`, synthetic season in `tests/helpers/profile-season.mjs`
 - Verify: `npm test`, `npm run lint`, `npm run verify:source`, `npm run build`
 

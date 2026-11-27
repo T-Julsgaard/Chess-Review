@@ -106,8 +106,7 @@ the profile: the username, the numbers shown on the slides, and links to the gam
 mention. A fragment is never sent to a server: the viewer page, served by GitHub Pages,
 decodes it in the reader's browser. GitHub therefore sees the request for the page itself
 (including the reader's IP address, under GitHub's own privacy terms) but not the profile.
-Anyone you send the link to can read it; with the extension installed the same link opens
-the profile on the review board. **Download card** saves a PNG on your device and sends nothing.
+Anyone you send the link to can read it. **Download card** saves a PNG on your device and sends nothing.
 
 ## What we do NOT do
 

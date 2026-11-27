@@ -168,10 +168,10 @@ and fetch public games. offscreen (Chrome only) opens a hidden extension page,
 preview.html, with the WORKERS reason to run the bundled engine for the accuracy
 preview on the review button of a finished game. A Chrome service worker cannot
 start that WebAssembly worker itself. The page shows nothing, sends nothing, and
-closes when no preview is queued. Since 0.6.0 a content script,
-profile-viewer-content.js, also runs on
-`https://t-julsgaard.github.io/Chess-Review/profile/*`, the project's own shared
-profile page described in PRIVACY.md. Update the Chrome privacy form to match PRIVACY.md; do not
+closes when no preview is queued. The host and content-script sites are the same
+as in 0.5.1 (Chess.com and Lichess only). A new site would count as a new permission,
+and Chrome disables an updated extension until each user approves it, so the shared
+profile page on GitHub Pages runs no content script. Update the Chrome privacy form to match PRIVACY.md; do not
 claim that no lookup identifiers ever leave the device.
 
 ### Bundled libraries
