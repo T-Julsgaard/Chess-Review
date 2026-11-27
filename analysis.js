@@ -4166,10 +4166,10 @@ function fitMoveExplanation(node, text, options) {
 }
 function openingStrip() {
   const o = (S.analysisMode && S.variation ? variationOpening() : S.opening);
-  const line = o ? `${o.eco}${o.eco && o.name ? " · " : ""}${o.name}` : "Opening unknown";
+  // Just the opening's name: no book icon, and no ECO code (the "C20"-style catalogue number).
+  const line = o?.name || "Opening unknown";
   return el("div", { class: "ip-heading" },
     el("div", { class: "ip-opening" },
-      el("span", { class: "ip-op-ic", html: ICONS.book || "" }),
       el("span", { class: "ip-op-txt" }, line)),
     el("button", { type: "button", class: "ip-explanations-toggle", role: "switch",
       "aria-label": settingsText("Engine explanations"), "aria-checked": String(engineExplanationsEnabled()),

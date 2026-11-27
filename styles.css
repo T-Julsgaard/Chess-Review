@@ -2406,8 +2406,10 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--accent); font-weight: 700; font-size: 11.5px; letter-spacing: .03em;
   flex: none;
 }
-.ip-opening .ip-op-ic { display: inline-flex; width: 15px; height: 15px; flex: none; opacity: .85; }
-.ip-opening .ip-op-ic svg { width: 15px; height: 15px; }
+/* The opening, switch and close button share one recessed well, like the Accuracy tabs. */
+.ip-heading { margin: 4px 8px 0; border: 1px solid var(--line-soft); border-radius: 11px; background: color-mix(in oklab,var(--bg) 78%,var(--panel));
+  box-shadow: inset 0 1px 3px color-mix(in oklab,#000 28%,transparent), 0 1px 0 color-mix(in oklab,#fff 4%,transparent); }
+.ip-heading .ip-opening { border-bottom: 0; }
 .ip-opening .ip-op-txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* the body scrolls if the content (e.g. the hint button) is taller than the module, so nothing
    spills out behind the panel below it */
