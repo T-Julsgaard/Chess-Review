@@ -12,14 +12,14 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@remotion/cli": "4.0.543",
+    "@remotion/cli": "4.0.545",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "remotion": "4.0.543"
+    "remotion": "4.0.545"
   },
   "devDependencies": {
     "@types/react": "19.3.0",
-    "playwright-core": "1.65.0",
+    "playwright-core": "1.65.1",
     "typescript": "7.0.2"
   },
   "overrides": {
