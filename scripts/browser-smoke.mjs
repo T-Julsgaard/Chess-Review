@@ -145,7 +145,7 @@ try {
     const ratingSection=()=>[...doc.querySelectorAll('.set-section')].find(section=>section.textContent.includes('Estimated rating'));
     const labels=[...ratingSection().querySelectorAll('.lib-dd-opt')].map(button=>button.textContent);
     if(JSON.stringify(labels)!==JSON.stringify(['Use recorded rating','Moves only']))throw Error('Rating options missing for '+key);
-    if(JSON.stringify([...doc.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].map(tab=>tab.textContent))!==JSON.stringify(['Visual','Review & Coach','Engine','Sound','Developer tools']))throw Error('Settings tabs changed');
+    if(JSON.stringify([...doc.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].map(tab=>tab.textContent))!==JSON.stringify(['Visual','Language','Review & Coach','Engine','Sound','Developer tools']))throw Error('Settings tabs changed');
     if(doc.querySelector('#conceptsMount'))throw Error('Retired concept panel present');
     const calibration=await (await fetch('./data/calibration.json')).json();
     const chess=new Chess(),game=new Chess(),positions=[{fen:chess.fen()}];
@@ -221,8 +221,10 @@ try {
             doc.querySelector('#accuracy-tab-'+page).click();await wait(25);
             const body=doc.querySelector('.accuracy-panel .acc-page'),rect=body.getBoundingClientRect();
             const children=[...body.querySelectorAll('.phase-rating,.phase-report-row,.qbreak-row')];
-            if(body.scrollHeight!==body.clientHeight||body.scrollWidth!==body.clientWidth||children.some(n=>n.getBoundingClientRect().bottom>rect.bottom+.5))
-              throw Error('Accuracy page needs scrolling or clips results: '+JSON.stringify({width,height,page,busy,body:body.clientHeight,content:body.scrollHeight}));
+            // Quality scrolls quietly (no scroll bar) only once it reaches its legible minimum zoom; Overview always fits.
+            const zoom=Number(body.querySelector('.acc-fit-content')?.style.zoom||1),quietScroll=page===1&&zoom<=.85&&body.offsetWidth===body.clientWidth;
+            if(body.scrollWidth!==body.clientWidth||(!quietScroll&&(body.scrollHeight!==body.clientHeight||children.some(n=>n.getBoundingClientRect().bottom>rect.bottom+.5))))
+              throw Error('Accuracy page needs scrolling or clips results: '+JSON.stringify({width,height,page,busy,body:body.clientHeight,content:body.scrollHeight,zoom}));
             if(page===0&&(body.querySelectorAll('.acc-dial svg').length!==2||body.querySelectorAll('.phase-report-row').length!==3))throw Error('Accuracy design changed');
             if(page===1&&(body.querySelectorAll('.qbreak-row').length!==10||new Set([...body.querySelectorAll('.qbreak-row')].map(n=>Math.round(n.getBoundingClientRect().left))).size!==1))throw Error('Quality category list changed');
           }
