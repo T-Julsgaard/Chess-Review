@@ -40,6 +40,8 @@ async function storyDeck(t) {
   a.store[rowsKey('chesscom', 'tester')] = {rows, months: [], since: 0, updatedAt: Date.now()};
   a.store[IDENTITY_KEY] = {chesscom: {accounts: [{name: 'tester', seenAt: Date.now(), via: 'test'}]}};
   await a.call('openProfile'); for (let i = 0; i < 6; i++) await settle();
+  // The username box starts empty: click it and pick the earlier name from the list.
+  for (const input of a.dom.window.document.querySelectorAll('.profile-account-field input')) if (!input.value) { input.click(); input.parentNode.querySelector('.profile-suggest-option')?.click(); }
   a.dom.window.document.querySelector('.profile-build').click(); for (let i = 0; i < 6; i++) await settle();
   return {a, doc: a.dom.window.document, w: a.run('profileWorkspace')};
 }

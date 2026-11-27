@@ -26,6 +26,8 @@ function seed(a, account = 'tester') {
 }
 async function openDeck(a) {
   await a.call('openProfile'); for (let i = 0; i < 6; i++) await settle();
+  // The username box starts empty: click it and pick the earlier name from the list.
+  for (const input of a.dom.window.document.querySelectorAll('.profile-account-field input')) if (!input.value) { input.click(); input.parentNode.querySelector('.profile-suggest-option')?.click(); }
   a.dom.window.document.querySelector('.profile-build').click(); for (let i = 0; i < 6; i++) await settle();
   return a.run('profileWorkspace');
 }
@@ -753,8 +755,11 @@ test('returning to Game review resets Player Profile to username entry', async t
   assert.equal(next.phase, 'setup');
   assert.equal(doc.querySelector('.pv-story'), null);
   const username = doc.querySelector('.profile-setup input[type="text"]');
-  assert.equal(username.value, 'tester');
+  assert.equal(username.value, '', 'the box starts empty');
   assert.equal(doc.activeElement, doc.querySelector('.profile-shell'), 'the username box is not focused until it is clicked');
+  username.click();
+  assert.equal(username.getAttribute('aria-expanded'), 'true');
+  assert.equal(doc.querySelector('.profile-suggest-option').textContent, 'tester', 'the last name used is offered first');
   username.value = 'other';
   username.dispatchEvent(new a.dom.window.Event('input'));
   doc.querySelector('.profile-build').click(); for (let i = 0; i < 6; i++) await settle();

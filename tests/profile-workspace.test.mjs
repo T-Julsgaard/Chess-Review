@@ -19,7 +19,11 @@ function review(t) {
 }
 async function open(a) { await a.call('openProfile'); for (let i = 0; i < 6; i++) await settle(); }
 // Opening asks first; nothing loads until the player presses Build profile.
-async function build(a) { a.dom.window.document.querySelector('.profile-build').click(); for (let i = 0; i < 6; i++) await settle(); }
+// The username box starts empty: an empty box is filled the way a player would, by clicking it and picking the earlier name.
+function pickRemembered(a) {
+  for (const input of a.dom.window.document.querySelectorAll('.profile-account-field input')) if (!input.value) { input.click(); input.parentNode.querySelector('.profile-suggest-option')?.click(); }
+}
+async function build(a) { pickRemembered(a); a.dom.window.document.querySelector('.profile-build').click(); for (let i = 0; i < 6; i++) await settle(); }
 async function openDeck(a) { await open(a); await build(a); }
 function seed(a, rows = season(), account = 'tester') {
   const seeded = rows.map(r => ({...r, opp: r.opp === 'tester' ? 'someone' : r.opp}));
@@ -72,7 +76,9 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   await open(a);
   const shell = doc.querySelector('.profile-shell');
   assert.ok(shell, 'shell mounted');
-  assert.equal(shell.querySelector('.profile-setup input').value, 'tester', 'the known account is prefilled');
+  assert.equal(shell.querySelector('.profile-setup input').value, '', 'the username box starts empty');
+  shell.querySelector('.profile-setup input').click();
+  assert.deepEqual([...shell.querySelectorAll('.profile-suggest-option')].map(o => o.textContent), ['tester'], 'the known account is offered when the box is clicked');
   assert.equal(shell.querySelector('.pv-story'), null, 'nothing loads before Build profile');
   await build(a);
   assert.equal(shell.querySelector('.profile-head-title').textContent, 'tester');
@@ -250,6 +256,7 @@ test('profile setup: custom dates validate, filter the report and survive reopen
   assert.equal(shell.querySelector('[aria-controls="profile-custom-period"]').getAttribute('aria-expanded'), 'true');
   const date = (i, value) => { inputs[i].value = value; inputs[i].dispatchEvent(new a.dom.window.Event('input')); };
   date(0, '2026-03-01'); date(1, '2026-02-28');
+  pickRemembered(a);
   shell.querySelector('.profile-build').click(); await settle();
   assert.match(shell.querySelector('[role="alert"]:not([hidden])').textContent, /end date must be on or after/);
   assert.equal(w.phase, 'setup');
