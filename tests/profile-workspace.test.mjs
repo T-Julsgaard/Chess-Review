@@ -221,8 +221,13 @@ test('profile setup: an unknown account can be corrected below its username fiel
         input.dispatchEvent(new a.dom.window.Event('input'));
       };
       type('UnknownPlayer');
+      const form = shell.querySelector('.profile-setup'), head = shell.querySelector('.profile-head-main');
       await build(a);
       assert.equal(new URL(fetch.mock.calls[0].arguments[0]).hostname, host);
+      // The site is asked before the panel is cleared: the same form and heading stay, nothing reloads.
+      assert.equal(shell.querySelector('.profile-setup'), form);
+      assert.equal(shell.querySelector('.profile-head-main'), head);
+      assert.equal(a.state.settings.profileAccounts?.[site], undefined, 'an unknown name is not remembered');
       assert.equal(doc.location.href, url);
       assert.equal(shell.querySelector('.profile-empty'), null);
       assert.equal(choose('All time').getAttribute('aria-checked'), 'true');
