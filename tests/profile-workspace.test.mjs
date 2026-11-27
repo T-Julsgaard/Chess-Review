@@ -198,12 +198,15 @@ test('profile setup: an unknown account can be corrected below its username fiel
     await t.test(label, async t => {
       const a = review(t), doc = a.dom.window.document, rows = season();
       const url = doc.location.href;
-      a.state.settings.profileSite = site;
+      // A remembered Lichess choice no longer carries over: setup opens on Chess.com.
+      a.state.settings.profileSite = 'lichess';
       a.store[rowsKey(site, 'tester')] = {rows, months: [], since: 0, updatedAt: Date.now()};
       const fetch = t.mock.method(globalThis, 'fetch', async () => ({ok: false, status: 404}));
       await open(a);
       const shell = doc.querySelector('.profile-shell');
       const choose = text => [...shell.querySelectorAll('[role="radio"]')].find(b => b.textContent === text);
+      assert.equal(choose('Chess.com').getAttribute('aria-checked'), 'true');
+      choose(label).click();
       choose('All time').click();
       const field = () => shell.querySelector(`[data-site="${site}"]`);
       const type = value => {
@@ -332,8 +335,11 @@ test('profile: the Lichess country flag follows the username on the cover and ov
   const a = review(t), doc = a.dom.window.document;
   const rows = season().map(r => ({...r, site: 'lichess'}));
   a.store[rowsKey('lichess', 'tester')] = {rows, months: [], since: 0, updatedAt: Date.now()};
-  a.replace('profileIdentity', async () => ({site: 'lichess', accounts: ['tester'], country: 'DK'}));
-  await openDeck(a);
+  a.replace('profileIdentity', async () => ({site: 'lichess', accounts: ['tester'], accountsBySite: {lichess: ['tester']}, country: 'DK'}));
+  await open(a);
+  // Setup opens on Chess.com; the known Lichess name fills in once Lichess is chosen.
+  [...doc.querySelectorAll('.profile-setup [role="radio"]')].find(b => b.textContent === 'Lichess').click();
+  await build(a);
   const w = a.run('profileWorkspace');
   const heading = doc.querySelector('.pv-story-figure');
   assert.equal(heading.firstChild.textContent, 'tester');

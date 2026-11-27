@@ -35,6 +35,9 @@ test('Chess.com lookup stays inside Insights, Moves and the move controls until 
     return Response.json({games: [game('12345', 1700000000), game('98765', 1701000000), {...game('22222', 1702000000), rules: 'bughouse'}]});
   });
   search(''); assert.equal(urls.length, 0); assert.equal(select('input[aria-invalid]').id, 'archive-username');
+  // The error hangs inside the field wrapper (positioned out of flow), so the centred form doesn't move.
+  assert.equal(select('#archive-input-error').parentElement, select('.archive-field'));
+  assert.equal(select('#archive-input-error').hidden, false);
   search('River'); await tick();
   assert.match(urls[0], /\/player\/river\/games\/\d{4}\/\d{2}$/);
   assert.equal(select('.archive-count').textContent, '2 games');

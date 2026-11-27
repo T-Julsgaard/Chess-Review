@@ -60,7 +60,8 @@
   transition: border-color .15s, box-shadow .15s;
 }
 .archive-form .profile-input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb,var(--accent) 22%,transparent); }
-.archive-form .profile-setup-error { margin: 0; font-size: 12px; }
+.archive-field { position: relative; flex: none; }
+.archive-form .profile-setup-error { position: absolute; inset: 100% 0 auto; margin: 0; padding-top: 6px; font-size: 12px; line-height: 1.35; }
 .archive-submit, .archive-retry {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px;
   border: 1px solid transparent; border-radius: 8px; padding: 5px 12px;
