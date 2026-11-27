@@ -754,7 +754,7 @@ test('returning to Game review resets Player Profile to username entry', async t
   assert.equal(doc.querySelector('.pv-story'), null);
   const username = doc.querySelector('.profile-setup input[type="text"]');
   assert.equal(username.value, 'tester');
-  assert.equal(doc.activeElement, username);
+  assert.equal(doc.activeElement, doc.querySelector('.profile-shell'), 'the username box is not focused until it is clicked');
   username.value = 'other';
   username.dispatchEvent(new a.dom.window.Event('input'));
   doc.querySelector('.profile-build').click(); for (let i = 0; i < 6; i++) await settle();
