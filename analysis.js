@@ -5689,19 +5689,23 @@ function renderPhaseReport(sides, busy, compact = false) {
   }));
 }
 function renderPhaseOverview(sides, busy, modern = false) {
+  const design = panelDesign('accuracy', S.settings), banded = design === 'phases-band';
+  // Version 4 colours each player's rating like their overall score.
+  const band = side => banded && !busy ? phasePerformance(S.acc[side]) : null;
   return el('div', {class: 'phase-overview'},
     el('div', {class: 'phase-summary'},
       el('span', {class: 'phase-summary-label'}, 'Accuracy'),
       el('div', {class: 'phase-overall-values'}, ...sides.map(side => modern ? accuracyDial(S.acc[side], busy, {
-        split: SPLIT_SCORE_DESIGNS.includes(panelDesign('accuracy', S.settings)), banded: panelDesign('accuracy', S.settings) === 'phases-band'})
+        split: SPLIT_SCORE_DESIGNS.includes(design), banded})
         : busy ? loaderNode('acc-val', 'var(--accent)')
         : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side] >= 100 ? '100' : S.acc[side].toFixed(1))))),
     renderPhaseReport(sides, busy),
     el('div', {class: 'phase-rating'},
       el('span', {class: 'acc-elo-label'}, 'Estimated rating'),
       el('div', {class: 'phase-rating-values'}, ...sides.map(side => {
-        const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side);
-        return el('strong', {class: 'acc-elo'}, busy ? accuracyPendingValue() : rating == null ? '—' : '≈ ' + rating);
+        const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side), category = band(side)?.category;
+        return el('strong', {class: 'acc-elo', 'data-phase-category': category || null,
+          style: category ? {color: QUALITY[category].color} : null}, busy ? accuracyPendingValue() : rating == null ? '—' : '≈ ' + rating);
       }))));
 }
 

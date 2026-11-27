@@ -86,7 +86,7 @@ test('the overview reveal counts a split score up in its own two sizes', () => {
   assert.equal(panel.hasAttribute('data-revealing'), false);
 });
 
-test('Default version 4 colours each overall score by its performance band, like the phase cards', async t => {
+test('Default version 4 colours each overall score and rating by its performance band, like the phase cards', async t => {
   const accuracy = PANEL_DESIGNS.find(design => design.panel === 'accuracy');
   assert.equal(accuracy.versions[3].id, 'phases-band');
   assert.equal(accuracy.versions[3].label, 'Default version 4');
@@ -100,7 +100,8 @@ test('Default version 4 colours each overall score by its performance band, like
   const panel = doc.querySelector('.accuracy-panel');
   assert.ok(panel.matches('.accuracy-phase-modern.accuracy-phase-gauge.accuracy-phase-band'), 'Version 3 with colour');
   const strip = node => { const copy = node.cloneNode(true); copy.querySelector('.phase-summary').remove(); return copy.innerHTML; };
-  assert.equal(strip(doc.querySelector('.phase-overview')), strip(v3), 'Phases and ratings are unchanged');
+  const unrated = node => { const copy = node.cloneNode(true); copy.querySelector('.phase-rating').remove(); return strip(copy); };
+  assert.equal(unrated(doc.querySelector('.phase-overview')), unrated(v3), 'Phases are unchanged');
 
   const colours = () => [...doc.querySelectorAll('.phase-summary .acc-dial')].map(dial => [dial.dataset.phaseCategory, dial.style.getPropertyValue('--score-color')]);
   for (const [w, b, expected] of [
@@ -110,6 +111,8 @@ test('Default version 4 colours each overall score by its performance band, like
   ]) {
     a.state.acc = {w, b}; a.call('renderStats');
     assert.deepEqual(colours(), expected);
+    assert.deepEqual([...doc.querySelectorAll('.phase-rating-values .acc-elo')].map(node => [node.dataset.phaseCategory, node.style.color]),
+      expected, 'Each rating takes its player overall colour');
     assert.ok(doc.querySelector('.phase-summary .acc-val-split'), 'Keeps Version 3\'s split number');
   }
   // Same bands as the phase cards.
@@ -120,7 +123,8 @@ test('Default version 4 colours each overall score by its performance band, like
   assert.deepEqual(colours()[0], [undefined, '']);
   a.state.analyzing = true; a.call('renderStats');
   assert.deepEqual(colours(), [[undefined, ''], [undefined, '']]);
+  assert.equal(doc.querySelector('.phase-rating-values .acc-elo[style]'), null);
   a.state.analyzing = false;
   await a.call('setSetting', 'accuracyDesign', 'phases-modern');
-  assert.equal(doc.querySelector('.accuracy-phase-band,[data-phase-category].acc-dial'), null);
+  assert.equal(doc.querySelector('.accuracy-phase-band,[data-phase-category].acc-dial,.acc-elo[data-phase-category]'), null);
 });
