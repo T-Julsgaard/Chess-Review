@@ -206,9 +206,13 @@ for (const updating of [false, true]) test(`${updating ? 'updating' : 'new'} use
   assert.equal(store[pending], true);
   assert.equal(a.state.settings.coachEngineReplies, false);
   await a.call('applyGame', {pgn: '1. e4 e5 2. Nf3 Nc6', meta: {}, analysis: null});
-  await new Promise(resolve => a.dom.window.setTimeout(resolve, 150));
-  await a.run('_settingsWriteQueue'); await settle();
+  const wait = ms => new Promise(resolve => a.dom.window.setTimeout(resolve, ms));
+  await wait(150);
   assert.equal(doc.querySelector('.learning-announcement h2').textContent, 'Engine explanations');
+  assert.equal(store.settings.coachEngineReplies, false, 'The switch stays off while the user finds it');
+  // The card pauses, the switch slides on, then the coach falls before Got it is ready.
+  for (let i = 0; i < 60 && doc.querySelector('.learning-announcement-dismiss').hasAttribute('aria-disabled'); i++) await wait(100);
+  await a.run('_settingsWriteQueue'); await settle();
   assert.ok(doc.querySelector('.ip-explanations-toggle.learning-announcement-target'), 'The first game points to the switch');
   assert.equal(store.settings.coachEngineReplies, true);
   assert.equal(store[pending], false);

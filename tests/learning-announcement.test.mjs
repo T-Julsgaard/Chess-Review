@@ -80,7 +80,7 @@ test('a hidden or closed page cannot claim while waiting for the origin lock', a
   assert.equal(await result, false); assert.equal(p.data[seen], undefined);
 });
 
-function setup(t, {hidden = false, motion = false, game = true, shared} = {}) {
+function setup(t, {hidden = false, motion = false, game = true, shared, explanationsDelay = 0} = {}) {
   // Without a game, Insights holds the saved-games search and no explanations switch.
   const toggle = '<button class="ip-explanations-toggle" data-section="explanations"></button>';
   const dom = new JSDOM(`<header class="topbar"></header><nav class="section-rail"><button class="section-btn" data-section="learn">Learn</button><button class="section-btn" data-section="playstyle">Playstyle</button></nav><div id="canvas"><button class="learn-entry-button">Solve Puzzles</button><div class="insight-panel">${game ? toggle : '<form class="archive"></form>'}</div></div>`,
@@ -91,8 +91,9 @@ function setup(t, {hidden = false, motion = false, game = true, shared} = {}) {
   let visibility = hidden ? 'hidden' : 'visible';
   Object.defineProperty(dom.window.document, 'visibilityState', {get: () => visibility});
   const settingsChanges = [];
+  // The paced engine demonstration has its own test against the real app.
   const mount = () => mountLearningAnnouncement({document: dom.window.document, storage: p.storage, motion: () => motion,
-    setEngineExplanations: enabled => { settingsChanges.push(enabled); }});
+    explanationsDelay, setEngineExplanations: enabled => { settingsChanges.push(enabled); }});
   t.after(() => dom.window.close());
   const document = dom.window.document;
   return {...p, dom, document, mount, settingsChanges,
@@ -182,32 +183,96 @@ test('the second morph timeout still advances to engine explanations', async t =
   assert.deepEqual(p.settingsChanges, [false, true]);
 });
 
-test('engine explanations target follows the live switch after Insights rerenders', async t => {
+function engineApp(t, {motion = false, explanationsDelay = 0} = {}) {
   const a = app(t), p = persistence(), doc = a.dom.window.document;
   loadGame(a, '1. e4 e5'); a.state.settings.coach = 'old_soviet';
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll'); a.call('applySettings');
   Object.defineProperty(a.dom.window.navigator, 'locks', {value: {request: (name, callback) =>
     name === 'chess-review-settings' ? callback() : p.locks.request(name, callback)}});
   const changes = [];
-  const controller = mountLearningAnnouncement({document: doc, storage: p.storage, motion: () => false,
+  const controller = mountLearningAnnouncement({document: doc, storage: p.storage, motion: () => motion, explanationsDelay,
     setEngineExplanations: async enabled => { changes.push(enabled); await a.call('setCoachEngineReplies', enabled); }});
-  t.after(() => controller.dispose()); await controller.ready;
+  t.after(() => controller.dispose());
+  return {a, doc, changes, controller, gotIt: () => doc.querySelector('.learning-announcement-dismiss'),
+    wait: ms => new Promise(resolve => a.dom.window.setTimeout(resolve, ms))};
+}
+
+test('engine explanations target follows the live switch after Insights rerenders', async t => {
+  const {a, doc, changes, controller, gotIt} = engineApp(t); await controller.ready;
   assert.ok(doc.querySelector('.learning-announcement'));
   assert.equal(a.call('engineExplanationsEnabled'), false);
   assert.ok(doc.querySelector('.coach-frame'));
   const oldSwitch = doc.querySelector('.ip-explanations-toggle');
-  const gotIt = doc.querySelector('.learning-announcement-dismiss'); gotIt.focus();
-  doc.querySelector('.learning-announcement-dismiss').click();
-  doc.querySelector('.learning-announcement-dismiss').click(); await settle();
-  assert.equal(doc.activeElement, gotIt, 'Saving the preference keeps keyboard focus on Got it');
+  const button = gotIt(); button.focus();
+  gotIt().click(); gotIt().click(); await settle();
+  assert.equal(doc.activeElement, button, 'Saving the preference keeps keyboard focus on Got it');
   assert.equal(oldSwitch.isConnected, false);
   assert.equal(doc.querySelector('.ip-explanations-toggle').getAttribute('aria-checked'), 'true');
   assert.ok(doc.querySelector('.ip-explanations-toggle.learning-announcement-target'));
   assert.equal(doc.querySelector('.coach-frame'), null);
   assert.equal(a.store.settings.coachEngineReplies, true);
-  doc.querySelector('.learning-announcement-dismiss').click();
+  gotIt().click();
   assert.deepEqual(changes, [false, true]);
   assert.equal(a.call('engineExplanationsEnabled'), true);
+});
+
+test('the engine card pauses, slides the switch on, lets the coach fall, then readies Got it', async t => {
+  const {a, doc, changes, controller, gotIt, wait} = engineApp(t, {motion: true, explanationsDelay: 200});
+  a.dom.window.matchMedia = () => ({matches: false});
+  await controller.ready;
+  doc.querySelector('.coach-frame').classList.add('ready'); // jsdom never loads the portrait
+  const title = () => doc.querySelector('.learning-announcement h2').textContent;
+  gotIt().click(); await wait(1000); gotIt().click();
+  for (let i = 0; i < 100 && title() !== 'Engine explanations'; i++) await wait(10);
+  assert.equal(title(), 'Engine explanations');
+  const live = doc.querySelector('.ip-explanations-toggle');
+  assert.equal(live.getAttribute('aria-checked'), 'false', 'The switch is still off while the user finds it');
+  assert.ok(doc.querySelector('.coach-frame'), 'The coach is still there');
+  assert.deepEqual(changes, [false]);
+  assert.equal(gotIt().getAttribute('aria-disabled'), 'true');
+  gotIt().click();
+  assert.ok(doc.querySelector('.learning-announcement'), 'Got it waits for the demonstration');
+  await wait(200);
+  assert.equal(live.isConnected, true);
+  assert.equal(live.getAttribute('aria-checked'), 'true', 'The switch on screen slides on before Insights rebuilds');
+  assert.deepEqual(changes, [false], 'The setting changes once the slide has played');
+  await wait(450); await settle();
+  assert.deepEqual(changes, [false, true]);
+  assert.equal(a.store.settings.coachEngineReplies, true);
+  assert.equal(gotIt().getAttribute('aria-disabled'), 'true', 'Got it waits while the coach falls');
+  await wait(700);
+  assert.equal(gotIt().hasAttribute('aria-disabled'), false);
+  gotIt().click(); await wait(400);
+  assert.equal(doc.querySelector('.learning-announcement'), null);
+});
+
+test('a coach still loading for a new game arrives and is seen before the switch moves', async t => {
+  const p = setup(t, {game: false, motion: true, explanationsDelay: 50}), win = p.dom.window;
+  win.matchMedia = () => ({matches: false});
+  const wait = ms => new Promise(resolve => win.setTimeout(resolve, ms));
+  const controller = p.mount(); await controller.ready;
+  gotIt(p); await wait(1000); gotIt(p); await wait(400);
+  p.loadGame();
+  const coach = p.document.createElement('iframe'); coach.className = 'coach-frame'; p.document.body.append(coach);
+  await p.watched(); await wait(300);
+  assert.equal(title(p), 'Engine explanations');
+  assert.equal(p.document.querySelector('.ip-explanations-toggle').getAttribute('aria-checked'), null, 'Nothing moves while the coach loads');
+  coach.classList.add('ready'); await wait(400);
+  assert.equal(p.document.querySelector('.ip-explanations-toggle').getAttribute('aria-checked'), null, 'The coach is seen first');
+  await wait(800);
+  assert.equal(p.document.querySelector('.ip-explanations-toggle').getAttribute('aria-checked'), 'true');
+  await wait(400);
+  assert.deepEqual(p.settingsChanges, [false, true]);
+  controller.dispose();
+});
+
+test('skipping the engine card before the switch moves still turns explanations on at once', async t => {
+  const {doc, changes, controller, gotIt} = engineApp(t, {explanationsDelay: 5000}); await controller.ready;
+  gotIt().click(); await settle(); gotIt().click(); await settle();
+  assert.deepEqual(changes, [false]);
+  doc.dispatchEvent(new doc.defaultView.KeyboardEvent('keydown', {key: 'Escape', bubbles: true})); await settle();
+  assert.equal(doc.querySelector('.learning-announcement'), null);
+  assert.deepEqual(changes, [false, true]);
 });
 
 test('closing the tab mid-morph cleans up without a late swap', async t => {

@@ -115,6 +115,9 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
 
   // The final step switches on explanations through the real animated setting path.
   await run("document.querySelector('.learning-announcement-dismiss').click()");
+  await sleep(700);
+  assert.equal(await run("document.querySelector('.ip-explanations-toggle').getAttribute('aria-checked')"), 'false', 'The switch waits while the user finds it');
+  assert.equal(await run("!!document.querySelector('.coach-frame')"), true, 'The coach waits too');
   await waitFor(review, "document.querySelector('.coach-transition')!==null", 'Intro coach exit animation');
   await screenshot('intro-coach-exit');
   await sleep(1100);
@@ -166,6 +169,10 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   assert.equal(await run("document.querySelector('.learning-announcement-dismiss').click();document.querySelector('.learning-announcement').dataset.step"), '3');
   await sleep(100);
   checkStep(await geometry(), 2);
+  // Even without motion, the switch changes only after a pause to find it.
+  assert.equal(await run("document.querySelector('.ip-explanations-toggle').getAttribute('aria-checked')"), 'false');
+  await waitFor(review, "!document.querySelector('.learning-announcement-dismiss').hasAttribute('aria-disabled')", 'Reduced-motion explanations');
+  assert.equal(await run("document.querySelector('.ip-explanations-toggle').getAttribute('aria-checked')"), 'true');
   assert.equal(await run(`document.querySelector('.learning-announcement-dismiss').click();${absent}`), true, 'Reduced motion dismisses immediately');
   await reloadShowsNothing('Reduced-motion tour must not show again');
   console.log('Intro tour: all three steps, coach exit, saved explanations, morph, arrows, viewports, dismissal, legacy users and reduced motion passed. Screenshots: ' + out);
