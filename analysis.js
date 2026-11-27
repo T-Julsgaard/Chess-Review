@@ -5177,40 +5177,25 @@ function accuracyPager() {
     motion: () => S.settings.uiAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
   return accuracyNavigation.element;
 }
-// Default version 3's dials are gauges: a notched track (one notch per 10%), a
-// fill that brightens towards its end, and a thumb where the score lands.
-const ACC_GAUGE_TRACK = Array.from({length: 10}, (_, i) => i < 9 ? '6.5 1' : '6.5 26').join(' ');
-let accuracyGaugeId = 0;
-function accuracyDial(value, busy, gauge = false) {
-  const NS = 'http://www.w3.org/2000/svg', node = (name, attrs) => {
-    const item = document.createElementNS(NS, name);
-    for (const [key, val] of Object.entries(attrs)) item.setAttribute(key, val);
-    return item;
-  };
-  const svg = node('svg', {viewBox: '0 0 120 120', 'aria-hidden': 'true'});
-  const length = busy || value == null ? 0 : .75 * Math.max(0, Math.min(100, value));
-  const gradient = gauge ? 'acc-gauge-' + (++accuracyGaugeId) : null;
-  if (gauge) {
-    const fade = node('linearGradient', {id: gradient, gradientUnits: 'userSpaceOnUse', x1: 8, y1: 60, x2: 112, y2: 60,
-      gradientTransform: 'rotate(-135 60 60)'});
-    fade.append(node('stop', {offset: 0, class: 'acc-gauge-stop-start'}), node('stop', {offset: 1, class: 'acc-gauge-stop-end'}));
-    const defs = node('defs', {}); defs.append(fade); svg.append(defs);
-  }
-  for (const [className, dash] of [['acc-dial-track', gauge ? ACC_GAUGE_TRACK : '75 100'], ['acc-dial-fill', length + ' 100']]) {
-    const circle = node('circle', {cx: 60, cy: 60, r: 51, pathLength: 100,
-      fill: 'none', transform: 'rotate(135 60 60)', class: className, 'stroke-dasharray': dash});
-    if (gauge && className === 'acc-dial-fill') circle.setAttribute('stroke', 'url(#' + gradient + ')');
+// Default version 3 sets the overall score as a large whole number with a smaller
+// decimal ("85" ".2"). Its text stays "85.2" for screen readers and the reveal.
+function accuracyDial(value, busy, split = false) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 120 120');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const [className, length] of [['acc-dial-track', 75], ['acc-dial-fill', busy || value == null ? 0 : .75 * Math.max(0, Math.min(100, value))]]) {
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    for (const [key, val] of Object.entries({cx: 60, cy: 60, r: 51, pathLength: 100,
+      fill: 'none', transform: 'rotate(135 60 60)', class: className, 'stroke-dasharray': length + ' 100'})) circle.setAttribute(key, val);
     if (className === 'acc-dial-fill' && length === 0) circle.setAttribute('stroke-opacity', 0);
     svg.append(circle);
   }
-  if (gauge && length > 0) {
-    const angle = (135 + 3.6 * length) * Math.PI / 180;
-    svg.append(node('circle', {class: 'acc-gauge-thumb', r: 5.5,
-      cx: (60 + 51 * Math.cos(angle)).toFixed(2), cy: (60 + 51 * Math.sin(angle)).toFixed(2)}));
-  }
-  return el('div', {class: 'acc-dial' + (gauge ? ' acc-gauge' : '')}, svg,
-    busy ? loaderNode('acc-val', 'var(--accent)') : el('strong', {class: 'acc-val'},
-      value == null ? '—' : value >= 100 ? '100' : value.toFixed(1)),
+  const text = value == null ? '—' : value >= 100 ? '100' : value.toFixed(1);
+  const [whole, decimal] = text.split('.');
+  return el('div', {class: 'acc-dial'}, svg,
+    busy ? loaderNode('acc-val', 'var(--accent)') : split && decimal
+      ? el('strong', {class: 'acc-val acc-val-split'}, el('span', {class: 'acc-val-whole'}, whole), el('span', {class: 'acc-val-decimal'}, '.' + decimal))
+      : el('strong', {class: 'acc-val'}, text),
     el('span', {class: 'acc-dial-label'}, 'Accuracy'));
 }
 function updateQualityDistribution(root, sides) {
@@ -5448,8 +5433,7 @@ function renderModernAdvanced(sides, busy) {
 }
 // Modern overviews share their Quality and Advanced pages. "Default version 2"
 // (phases-compact) always uses the compact overview that short panels get.
-// "Default version 3" (phases-gauge) is Default's layout with gauge dials, phase
-// meters and rating badges.
+// "Default version 3" (phases-gauge) is Default with restyled overall scores.
 const MODERN_ACCURACY_DESIGNS = ['phases-modern', 'phases-modern-v2', 'phases-compact', 'phases-gauge'];
 function renderStats() {
   const design = panelDesign('accuracy', S.settings);
@@ -5682,24 +5666,16 @@ function renderPhaseOverview2(sides, busy) {
 }
 
 function renderPhaseReport(sides, busy, compact = false) {
-  const gauge = !compact && panelDesign('accuracy', S.settings) === 'phases-gauge';
   return el('div', {class: 'phase-report' + (compact ? ' phase2-report' : ''), 'aria-label': 'Accuracy by game phase'}, ...GAME_PHASES.map((phase, index) => {
     const pending = accuracyPhasePending(phase, busy);
     const name = ['Opening', 'Middlegame', 'Endgame'][index];
-    // Default version 3 adds a meter under each score and marks the phase's
-    // stronger side.
-    const values = sides.map(side => pending ? null : S.gameStats?.[side]?.phases[phase]?.accuracy);
-    const best = values.every(Number.isFinite) && values[0].toFixed(1) !== values[1].toFixed(1) ? Math.max(...values) : null;
-    const cells = sides.map((side, i) => {
+    const cells = sides.map(side => {
       const stats = S.gameStats?.[side]?.phases[phase], value = stats?.accuracy;
       const band = pending ? null : phasePerformance(value), label = band ? categoryName(band.category) : pending ? 'Analyzing' : 'Not scored';
-      return el('div', {class: 'phase-report-cell' + (band ? '' : ' unavailable') + (gauge && best != null && values[i] === best ? ' phase-lead' : ''),
-        'data-phase-category': band?.category || '',
+      return el('div', {class: 'phase-report-cell' + (band ? '' : ' unavailable'), 'data-phase-category': band?.category || '',
         style: {'--phase-color': band ? QUALITY[band.category].color : 'var(--ink-3)'},
         'aria-label': S.players[side].name + ', ' + name + ': ' + (pending ? 'analyzing' : value == null ? 'not scored' : value.toFixed(1) + ' accuracy, ' + label + ', ' + stats.decisions + ' scored decisions')},
-        el('strong', {class: 'phase-report-score'}, pending ? accuracyPendingValue() : value == null ? '—' : value.toFixed(1)),
-        gauge ? el('span', {class: 'phase-meter', 'aria-hidden': 'true'},
-          el('i', {style: {width: (band ? Math.max(0, Math.min(100, value)) : 0) + '%'}})) : null);
+        el('strong', {class: 'phase-report-score'}, pending ? accuracyPendingValue() : value == null ? '—' : value.toFixed(1)));
     });
     return el('div', {class: 'phase-report-row' + (compact ? ' phase2-row' : ''), 'data-phase': phase, 'data-pending': String(pending)},
       el(compact ? 'span' : 'div', {class: 'phase-report-name'}, name),

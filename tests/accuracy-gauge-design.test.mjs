@@ -10,12 +10,6 @@ function review(t) {
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
   return a;
 }
-function phases(a, values) {
-  for (const side of ['w', 'b']) {
-    a.state.gameStats[side].phases = Object.fromEntries(['opening', 'middlegame', 'endgame'].map((phase, i) =>
-      [phase, values[side][i] == null ? {accuracy: null, decisions: 0} : {accuracy: values[side][i], decisions: 6}]));
-  }
-}
 
 test('Default version 3 is offered after Default version 2 and survives a reload', async t => {
   const accuracy = PANEL_DESIGNS.find(design => design.panel === 'accuracy');
@@ -37,82 +31,57 @@ test('Default version 3 is offered after Default version 2 and survives a reload
   assert.equal(restored.state.settings.accuracyDesign, 'phases-gauge');
 });
 
-test('Default version 3 shows gauge dials, phase meters and the stronger side of each phase', async t => {
+test('Default version 3 changes only the overall scores: a whole number with a smaller decimal', async t => {
   const a = review(t), doc = a.dom.window.document;
   await a.call('applyUiSetup', 'modern');
   await a.call('setSetting', 'accuracyDesign', 'phases-modern');
-  const defaultText = doc.querySelector('.phase-overview').textContent;
-  assert.equal(doc.querySelector('.acc-gauge,.phase-meter,.phase-lead,.acc-gauge-thumb'), null, 'Default is unchanged');
+  const strip = node => { const copy = node.cloneNode(true); copy.querySelector('.phase-summary').remove(); return copy.innerHTML; };
+  const defaultOverview = doc.querySelector('.phase-overview'), defaultRest = strip(defaultOverview);
+  const defaultDials = [...defaultOverview.querySelectorAll('.acc-dial svg')].map(svg => svg.outerHTML);
+  assert.equal(doc.querySelector('.acc-val-split'), null, 'Default is unchanged');
 
   const before = JSON.stringify({acc: a.state.acc, idx: a.state.idx});
   await a.call('setSetting', 'accuracyDesign', 'phases-gauge');
   const panel = doc.querySelector('.accuracy-panel');
   assert.equal(panel.dataset.design, 'phases-gauge');
   assert.ok(panel.matches('.accuracy-phase-modern.accuracy-phase-gauge'), 'Shares Default\'s layout and fit');
-  assert.equal(doc.querySelector('.phase-overview').textContent, defaultText, 'Same figures and labels as Default');
+  const overview = doc.querySelector('.phase-overview');
+  assert.equal(strip(overview), defaultRest, 'Phases and ratings are Default\'s');
+  assert.deepEqual([...overview.querySelectorAll('.acc-dial svg')].map(svg => svg.outerHTML), defaultDials, 'Same arcs');
+  assert.equal(overview.textContent, defaultOverview.textContent);
   assert.equal(JSON.stringify({acc: a.state.acc, idx: a.state.idx}), before);
 
-  // Each dial: a notched track (ten notches), a gradient fill and a thumb at the score.
-  a.state.acc = {w: 85.2, b: 50}; a.call('renderStats');
-  const dials = [...doc.querySelectorAll('.phase-summary .acc-dial.acc-gauge')];
-  assert.equal(dials.length, 2);
-  const track = dials[0].querySelector('.acc-dial-track').getAttribute('stroke-dasharray').split(' ').map(Number);
-  assert.equal(track.length, 20);
-  assert.equal(track.reduce((sum, value) => sum + value, 0), 100);
-  const fill = dials[0].querySelector('.acc-dial-fill');
-  const gradient = fill.getAttribute('stroke').match(/^url\(#(.+)\)$/)[1];
-  assert.ok(dials[0].querySelector('linearGradient#' + gradient));
-  assert.notEqual(gradient, dials[1].querySelector('.acc-dial-fill').getAttribute('stroke').match(/^url\(#(.+)\)$/)[1]);
-  assert.equal(fill.getAttribute('stroke-dasharray'), (.75 * 85.2) + ' 100');
-  // 50% lands at the top of the 270° arc.
-  const thumb = dials[1].querySelector('.acc-gauge-thumb');
-  assert.deepEqual([Number(thumb.getAttribute('cx')), Number(thumb.getAttribute('cy'))], [60, 9]);
-  // No score: no thumb, an empty fill.
+  a.state.acc = {w: 85.2, b: 100}; a.call('renderStats');
+  const values = [...doc.querySelectorAll('.phase-summary .acc-val')];
+  assert.deepEqual([...values[0].children].map(node => [node.className, node.textContent]),
+    [['acc-val-whole', '85'], ['acc-val-decimal', '.2']]);
+  assert.equal(values[0].textContent, '85.2');
+  assert.equal(values[1].textContent, '100');
+  assert.equal(values[1].classList.contains('acc-val-split'), false, 'A whole 100 has no decimal to set');
   a.state.acc.w = null; a.call('renderStats');
-  assert.equal(doc.querySelector('.acc-dial').querySelector('.acc-gauge-thumb'), null);
-  assert.equal(doc.querySelector('.acc-dial-fill').getAttribute('stroke-dasharray'), '0 100');
-
-  // Phase meters follow the score; the stronger side is marked, ties and gaps are not.
-  phases(a, {w: [83.1, 85.7, 100], b: [84.9, 85.7, null]}); a.call('renderStats');
-  const rows = [...doc.querySelectorAll('.phase-report-row')];
-  const meters = row => [...row.querySelectorAll('.phase-meter > i')].map(node => node.style.width);
-  const leads = row => [...row.querySelectorAll('.phase-report-cell')].map(node => node.classList.contains('phase-lead'));
-  assert.deepEqual(meters(rows[0]), ['83.1%', '84.9%']);
-  assert.deepEqual(leads(rows[0]), [false, true]);
-  assert.deepEqual(leads(rows[1]), [false, false], 'A tie marks neither side');
-  assert.deepEqual(meters(rows[2]), ['100%', '0%']);
-  assert.deepEqual(leads(rows[2]), [false, false], 'An unscored phase marks neither side');
-  assert.ok(rows[0].querySelector('.phase-meter').getAttribute('aria-hidden'));
-  assert.match(rows[0].querySelector('.phase-report-cell').getAttribute('aria-label'), /83\.1 accuracy/);
-
-  // While analysing, dials show the loader and no thumb.
+  assert.equal(doc.querySelector('.phase-summary .acc-val').textContent, '—');
   a.state.analyzing = true; a.call('renderStats');
-  assert.ok(doc.querySelector('.acc-gauge .acc-val.ld'));
-  assert.equal(doc.querySelector('.acc-gauge-thumb'), null);
+  assert.ok(doc.querySelector('.phase-summary .acc-val.ld'));
   a.state.analyzing = false;
 
-  // Quality and Advanced are Default's pages.
-  a.call('setAccuracyPage', 1);
-  assert.ok(doc.querySelector('.acc-page-quality.acc-fit-page .quality-distribution'));
-  a.call('setAccuracyPage', 2);
-  assert.ok(doc.querySelector('.acc-page-advanced .advanced-report'));
-  a.call('setAccuracyPage', 0);
-
   await a.call('setSetting', 'accuracyDesign', 'phases-modern');
-  assert.equal(doc.querySelector('.accuracy-phase-gauge,.phase-meter'), null);
+  assert.equal(doc.querySelector('.accuracy-phase-gauge,.acc-val-split'), null);
 });
 
-test('the overview reveal fills phase meters from zero with the scores', () => {
-  const dom = new JSDOM('<!doctype html><div class="accuracy-panel"><strong class="phase-report-score">80.0</strong><span class="phase-meter"><i style="width:80%"></i></span></div>', {pretendToBeVisual: true});
+test('the overview reveal counts a split score up in its own two sizes', () => {
+  const dom = new JSDOM('<!doctype html><div class="accuracy-panel"><strong class="acc-val acc-val-split"><span class="acc-val-whole">85</span><span class="acc-val-decimal">.2</span></strong></div>', {pretendToBeVisual: true});
   const frames = [];
   const reveal = createOverviewReveal({requestFrame: callback => frames.push(callback), cancelFrame: () => {}});
-  const panel = dom.window.document.querySelector('.accuracy-panel');
+  const panel = dom.window.document.querySelector('.accuracy-panel'), value = panel.querySelector('.acc-val');
   reveal.mount(panel, {game: {}, key: 'k'});
-  assert.equal(panel.querySelector('.phase-meter > i').style.width, '0%');
+  const ink = () => [...value.querySelector('.acc-reveal-ink').children].map(node => [node.className, node.textContent]);
+  assert.deepEqual(ink(), [['acc-val-whole', '0'], ['acc-val-decimal', '.0']]);
+  assert.equal(value.querySelector('.acc-reveal-accessible').textContent, '85.2');
+  assert.equal(value.querySelector('.acc-reveal-ghost .acc-val-decimal').textContent, '.2', 'The final size is reserved');
   frames.shift()(0); frames.shift()(600);
-  const mid = parseFloat(panel.querySelector('.phase-meter > i').style.width);
-  assert.ok(mid > 0 && mid < 80, String(mid));
+  const mid = Number(ink().map(([, text]) => text).join(''));
+  assert.ok(mid > 0 && mid < 85.2, String(mid));
   frames.shift()(1200);
-  assert.equal(panel.querySelector('.phase-meter > i').style.width, '80%');
+  assert.equal(value.innerHTML, '<span class="acc-val-whole">85</span><span class="acc-val-decimal">.2</span>');
   assert.equal(panel.hasAttribute('data-revealing'), false);
 });
