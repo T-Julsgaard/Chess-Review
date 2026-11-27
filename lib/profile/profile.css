@@ -311,6 +311,15 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-seg-lg button { border: 0; border-radius: 8px; min-height: 36px; padding: 6px 10px; font-size: 12.5px; background: transparent; color: var(--ink-2); transition: background .18s, color .18s, box-shadow .18s; }
 .profile-seg-lg button:hover:not(.on) { color: var(--ink); background: color-mix(in oklab, var(--ink) 5%, transparent); }
 .profile-seg-lg button.on { background: var(--panel); color: var(--ink); box-shadow: 0 1px 0 color-mix(in oklab, #fff 6%, transparent) inset, 0 2px 8px color-mix(in oklab, #000 22%, transparent), 0 0 0 1px color-mix(in oklab, var(--accent) 45%, var(--line)); }
+/* The setup choices share Learn's liquid pill, which flows from one pick to the next. */
+.profile-seg-glide { position: relative; isolation: isolate; }
+.profile-seg-glide > button { position: relative; z-index: 1; }
+.profile-seg-glide > button.on { color: var(--accent); }
+.profile-seg-glide[data-ready="true"] > button.on { background: transparent; box-shadow: none; }
+.profile-seg-pill { position: absolute; z-index: 0; pointer-events: none; visibility: hidden; border-radius: 8px;
+  background: radial-gradient(ellipse at 24% 0%, #ffffff0d, transparent 65%), linear-gradient(115deg, color-mix(in oklab, var(--accent) 22%, var(--panel)), color-mix(in oklab, var(--accent) 12%, var(--panel)));
+  box-shadow: inset 0 1px 0 #ffffff12, inset 0 -1px 0 #00000014, 0 0 0 1px color-mix(in oklab, var(--accent) 30%, transparent); }
+.profile-seg-glide[data-ready="true"] > .profile-seg-pill { visibility: visible; }
 .profile-setup .profile-input { max-width: none; min-height: 42px; padding: 9px 12px; font-size: 14px; border-radius: 10px; transition: border-color .15s, box-shadow .15s; }
 .profile-setup .profile-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent); }
 .profile-setup .profile-input.invalid { border-color: var(--q-blunder); box-shadow: 0 0 0 3px color-mix(in oklab, var(--q-blunder) 18%, transparent); }
