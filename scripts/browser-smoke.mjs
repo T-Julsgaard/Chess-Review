@@ -107,7 +107,7 @@ try {
   fresh.src='analysis.html?workspace=blank';
   assertModern(await waitWorkspace(fresh,firstDocument));await wait(300);
   if(fresh.contentDocument.querySelector('.learning-announcement'))throw Error('New-install note repeated');
-  fresh.contentDocument.querySelector('.learn-entry-button').click();
+  fresh.contentDocument.querySelector('[data-section=learn]').click();
   for(let i=0;i<200&&fresh.contentWindow.__smokePuzzleCount()!==50000;i++)await wait(100);
   if(fresh.contentWindow.__smokePuzzleCount()!==50000)throw Error('Packaged puzzle library did not load all 50,000 puzzles');
   fresh.remove();await report({step:'fresh-install-modern-and-note',modernPersists:true,twoPanelLines:true,bothButtonsHighlighted:true,noteShownOnce:true});

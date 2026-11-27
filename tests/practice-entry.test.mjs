@@ -32,13 +32,20 @@ test('Insights shows the starting hint and practice appears in the standalone sl
   assert.equal(doc.querySelector('.learn-entry-button'), null);
 });
 
-test('the standalone entry offers puzzles in the blank workspace and practice after analysis', t => {
+test('the standalone entry stays empty in the blank workspace and offers practice after analysis', t => {
   const a = review(t), S = a.state, doc = a.dom.window.document;
   const practice = () => doc.querySelector('[data-mod="learn"] .practice-btn');
+  const button = practice();
   S.blank = true; a.call('renderReview');
-  assert.equal(practice(), null);
-  assert.equal(doc.querySelector('[data-mod="learn"] .learn-entry-button').textContent, 'Solve Puzzles');
+  assert.equal(doc.querySelector('[data-mod="learn"]').textContent.includes('Solve Puzzles'), false);
+  assert.equal(practice(), button, 'the slot keeps its button so nothing shifts when a game loads');
+  assert.equal(button.classList.contains('is-waiting'), true);
+  assert.equal(button.disabled, true);
+  assert.equal(button.getAttribute('aria-hidden'), '');
   S.blank = false; S.analyzing = true; a.call('renderReview');
+  assert.equal(practice(), button);
+  assert.equal(button.classList.contains('is-waiting'), false);
+  assert.equal(button.hasAttribute('aria-hidden'), false);
   assert.equal(practice().disabled, true);
   S.analyzing = false; S.analysisError = 'Stopped'; a.call('renderReview');
   assert.equal(practice().disabled, true);

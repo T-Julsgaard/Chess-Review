@@ -38,7 +38,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
 
   await call('Page.navigate',{url:await run("location.origin+'/analysis.html?workspace=blank'")},review.sessionId);
   await waitFor(review,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>m.S.blank)",'Blank workspace');
-  await run("document.querySelector('.learn-entry-button').click()");
+  await run("document.querySelector('[data-section=learn]').click()");
   await waitFor(review,"!!document.querySelector('.learn-theme-list')",'Learning without a game');
   for(const width of [1280,390,320]){await resize(width);await checkTopbar();}
   assert.equal(await run("document.querySelector('.learn-footer, [data-focus=review]')"),null);

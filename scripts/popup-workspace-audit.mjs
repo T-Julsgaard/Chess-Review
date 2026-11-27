@@ -110,10 +110,10 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.equal(await run(blank,"document.activeElement===document.querySelector('#learningToggle')"),true);
   assert.equal(await run(blank,"document.querySelectorAll('.board .piece-img').length"),32);
   assert.equal(await run(review,"import('./browser-compat.js').then(async({browserAPI:api})=>JSON.stringify(await api.storage.local.get(['username','learning:v1','library']))===JSON.stringify(blankBaseline))"),true);
-  await run(blank,"document.querySelector('.learn-entry-button').click()");
-  await waitFor(blank,"!!document.querySelector('.learning-embedded .learn-board-dock .learn-board')",'Solve puzzles with the normal board');
+  await run(blank,"document.querySelector('[data-section=learn]').click()");
+  await waitFor(blank,"!!document.querySelector('.learning-embedded .learn-board-dock .learn-board')",'Learn puzzles with the normal board');
   await run(blank,"document.querySelector('#learningToggle').click()");
-  await waitFor(blank,"!document.querySelector('.learning-workspace')",'Return from Solve puzzles');
+  await waitFor(blank,"!document.querySelector('.learning-workspace')",'Return from Learn puzzles');
   console.log('Blank startup, zero engine/data work, narrow layouts and learning round-trip passed.');
 
   await run(blank,"document.querySelector('.lib-tab').click();document.querySelector('.lc-open').click()");

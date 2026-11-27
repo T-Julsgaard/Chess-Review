@@ -15,7 +15,7 @@ test('blank startup creates no game, engine, opening-book or calibration work',a
   assert.equal(a.state.positions.length,1);assert.equal(a.call('activePos').fen,new Chess().fen());
   assert.equal(doc.querySelectorAll('.board .sq').length,64);assert.equal(doc.querySelectorAll('.board .piece-img').length,32);
   assert.equal(doc.querySelectorAll('.ml-move').length,0);assert.ok(doc.querySelector('#statsMount .panel'));
-  assert.ok(doc.querySelector('#graphMount svg'));assert.equal(doc.querySelector('.practice-btn'),null);
+  assert.ok(doc.querySelector('#graphMount svg'));assert.equal(doc.querySelector('.practice-btn:not(.is-waiting)'),null);assert.doesNotMatch(doc.querySelector('[data-mod=learn]').textContent,/Solve Puzzles/);
   for(const name of ['Start','Previous','Play','Next','End'])assert.equal(doc.querySelector(`[aria-label="${name}"]`).disabled,true);
   assert.doesNotMatch(doc.querySelector('#canvas').textContent,/Analyzing|Use ← and →/);
   assert.equal(doc.title,'Chess Review');assert.equal(doc.querySelectorAll('[data-game-action]:not([hidden])').length,0);
@@ -65,7 +65,7 @@ test('game shortcuts and engine setting changes do not start work on a blank wor
   assert.equal(a.state.analyzing,false);assert.equal(a.state.evalEngines.length,0);assert.equal(a.state.flipped,false);assert.equal(a.state.autoTimer,null);
 });
 
-for(const entrySelector of ['[data-section=learn]','.learn-entry-button'])test(`${entrySelector} opens normal learning with the blank review board and restores it on return`,async t=>{
+for(const entrySelector of ['[data-section=learn]'])test(`${entrySelector} opens normal learning with the blank review board and restores it on return`,async t=>{
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[{id:'sample',fen:'7k/5Q2/6K1/8/8/8/8/8 w - - 0 1',solution:['f7f8'],rating:1200,themes:['mateIn1']}]})}));
   const a=blank(t);await a.start();const entry=a.dom.window.document.querySelector(entrySelector);entry.focus();
   const board=a.dom.window.document.querySelector('.board');entry.click();await settle();

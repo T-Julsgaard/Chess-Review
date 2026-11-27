@@ -1952,9 +1952,6 @@ let learningWorkspace = null;
 let learningAnnouncement = null;
 let openingLearning = false;
 let deferredPracticeAdvance = false;
-function solvePuzzlesButton() {
-  return reviewEntryButton("learn-entry-button", "Solve Puzzles", "book", () => selectSection("learn"));
-}
 function reviewEntryButton(className, label, glyph, activate) {
   return el("button", {
     type: "button", class: "review-entry-button " + className, "data-motion": S.settings.uiAnim === false ? "off" : "on",
@@ -4795,17 +4792,21 @@ function renderReview() {
   explanationPreview.cancel();
   _moveExplanationObserver?.disconnect();
   let entry = UI.reviewEntry.firstElementChild;
+  if (!entry?.matches(".practice-btn")) {
+    entry = reviewEntryButton("practice-btn", "Practice your mistakes", "first", startPractice);
+    UI.reviewEntry.replaceChildren(entry);
+  }
+  // Without a game the slot keeps its place but stays empty (Learn has the puzzles),
+  // so the panels do not shift when a game loads and the button fades in.
+  entry.classList.toggle("is-waiting", !!S.blank);
+  entry.toggleAttribute("aria-hidden", !!S.blank);
   if(S.blank){
-    if (!entry?.matches(".learn-entry-button")) UI.reviewEntry.replaceChildren(solvePuzzlesButton());
+    entry.disabled = true;
     const form = UI.archive?.form;
     if (form && UI.review.contains(form)) return;
     UI.review.replaceChildren(el("div",{class:"panel insight-panel"},
       form || el("div",{class:"ip-body"},el("div",{class:"ip-text"},"No game loaded."))));
     return;
-  }
-  if (!entry?.matches(".practice-btn")) {
-    entry = reviewEntryButton("practice-btn", "Practice your mistakes", "first", startPractice);
-    UI.reviewEntry.replaceChildren(entry);
   }
   entry.disabled = S.analyzing || !!S.analysisError || !!S.practice;
   // In-place progress text during analysis (so the loader animation doesn't restart each move).
@@ -8983,7 +8984,7 @@ function toggleAuto() {
 }
 document.addEventListener("keydown", (e) => {
   if (e.key === "Tab" && e.target?.closest?.(".ip-close-game,.review-entry-button")) return;
-  if (learningWorkspace?.closing && e.target?.closest?.('.section-btn,.learn-entry-button')
+  if (learningWorkspace?.closing && e.target?.closest?.('.section-btn')
       && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) {
     e.preventDefault();
     document.activeElement?.blur();
