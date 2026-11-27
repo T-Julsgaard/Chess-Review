@@ -4147,7 +4147,7 @@ function writeExplanation(node, text, {key, fresh = false, offset = 0, length = 
 const _moveExplanationFits = new WeakMap();
 let _moveExplanationObserver = null;
 // Measure the complete, laid-out explanation, including its inline move links.
-// Keep the first sentence when it exceeds three lines or the panel's space.
+// Keep the first sentence when it exceeds two lines or the panel's space.
 function fitMoveExplanation(node, text, options) {
   if (!node.isConnected || !node.getBoundingClientRect().width) return;
   node.classList.remove('ip-explanation-limited');
@@ -4155,7 +4155,7 @@ function fitMoveExplanation(node, text, options) {
   const lineHeight = parseFloat(getComputedStyle(node).lineHeight);
   const body = node.parentElement;
   const available = body.clientHeight - node.offsetTop - (parseFloat(getComputedStyle(body).paddingBottom) || 0);
-  const lines = available > 0 ? Math.max(1, Math.min(3, Math.floor((available + 1) / lineHeight))) : 3;
+  const lines = available > 0 ? Math.max(1, Math.min(2, Math.floor((available + 1) / lineHeight))) : 2;
   if (node.scrollHeight > lineHeight * lines + 1) {
     const end = text.indexOf('.') + 1;
     if (end > 0 && end < text.length) {

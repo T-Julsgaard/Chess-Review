@@ -209,9 +209,9 @@ test('written explanations respect reduced motion and sequence Dopamine detail a
   assert.ok(delay(detail.firstElementChild)>delay(summary.lastElementChild));
 });
 
-test('explanations over three rendered lines keep the first sentence and refit on resize',async t=>{
+test('explanations over two rendered lines keep the first sentence and refit on resize',async t=>{
   const a=review(t),win=a.dom.window,doc=win.document;
-  let fullLines=3,width=300,now=0;
+  let fullLines=2,width=300,now=0;
   const observers=[];
   win.ResizeObserver=class {
     constructor(callback){this.callback=callback;observers.push(this);}
@@ -232,11 +232,11 @@ test('explanations over three rendered lines keep the first sentence and refit o
   a.context.performance={now:()=>now};a.state.settings.uiAnim=true;
   await a.call('setCoachEngineReplies',true);
   const text=()=>doc.querySelector('.insight-panel .ip-text');
-  assert.equal(text().textContent,full,'Exactly three lines stay intact');
+  assert.equal(text().textContent,full,'Exactly two lines stay intact');
   const observer=observers.at(-1);
   assert.equal(observer.nodes[0],text());
   assert.equal(observer.nodes[1],text().parentElement);
-  now=200;fullLines=4;observer.callback();
+  now=200;fullLines=3;observer.callback();
   assert.equal(text().textContent,summary);
   assert.equal(text().querySelector('.ip-move-link').textContent,'Queen h4');
   assert.equal(text().querySelectorAll('.ip-move-link').length,1);

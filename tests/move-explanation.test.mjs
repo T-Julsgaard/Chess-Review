@@ -47,10 +47,10 @@ test('evaluation losses and alternatives distinguish your move from your opponen
       const own = explainMove({...evidence, viewerSide:side});
       const enemy = explainMove({...evidence, viewerSide:side === 'w' ? 'b' : 'w'});
       const strength = loss >= 200 ? 'much stronger' : 'better';
-      assert.equal(own.summary, `Your move gives your opponent a ${strength} position.`);
-      assert.equal(enemy.summary, `Your opponent's move gives you a ${strength} position.`);
-      assert.match(own.detail, /^You could have played /);
-      assert.match(enemy.detail, /^Your opponent could have played /);
+      assert.equal(own.summary, `This gives your opponent a ${strength} position.`);
+      assert.equal(enemy.summary, `This gives you a ${strength} position.`);
+      assert.match(own.detail, /^Better was /);
+      assert.match(enemy.detail, /^Better was /);
       assert.deepEqual(enemy.detailParts.filter(part=>part.move), own.detailParts.filter(part=>part.move));
       assert.deepEqual(enemy.alternative, own.alternative);
       assert.deepEqual(enemy.evaluation, own.evaluation);
@@ -64,21 +64,21 @@ test('evaluation losses and alternatives distinguish your move from your opponen
 test('reply tactics, best replies, missed chances and sound moves use the viewer’s identity', () => {
   const tactic = {...position('1. e4 e5 2. Nf3 d6 3. d4', 'Nc6'), category:'inacc', afterPv:'f1b5'};
   assert.match(explainMove({...tactic, viewerSide:'w'}).summary, /^You can reply Bishop b5, pinning/);
-  assert.match(explainMove({...tactic, viewerSide:'b'}).summary, /^Your opponent can reply Bishop b5, pinning/);
+  assert.equal(explainMove({...tactic, viewerSide:'b'}).summary, 'This allows Bishop b5, pinning your knight on c6 to your king.');
   const quiet = {...position('1. e4', 'e5'), afterPv:'g1f3'};
   assert.equal(explainMove({...quiet, viewerSide:'w'}).detail, 'Your best reply is Knight f3.');
   assert.equal(explainMove({...quiet, viewerSide:'b'}).detail, "Your opponent's best reply is Knight f3.");
   const miss = fromFen('r3k3/8/8/8/1n6/8/8/R3K3 b Qq - 0 1', 'Ke7',
     {category:'miss', beforePv:'b4c2', viewerSide:'w'});
-  assert.match(miss.summary, /^Your opponent's move misses Knight c2/);
+  assert.match(miss.summary, /^This misses Knight c2/);
   const fork = fromFen('r3k3/8/8/8/1n6/8/8/R3K3 b Qq - 0 1', 'Nc2+', {category:'best', viewerSide:'w'});
-  assert.match(fork.summary, /^Your opponent's move forks/);
+  assert.equal(fork.summary, 'This forks your king and your rook on a1.');
 });
 
 test('forced mate explanations identify who benefits and address the correct player', () => {
   const evidence = {...position('1. f3 e5', 'g4'), beforeScore:{cp:0}, afterScore:{mate:-3}};
-  assert.equal(explainMove({...evidence, viewerSide:'w'}).summary, 'Your move allows mate in 3 for your opponent.');
-  assert.equal(explainMove({...evidence, viewerSide:'b'}).summary, "Your opponent's move allows mate in 3 for you.");
+  assert.equal(explainMove({...evidence, viewerSide:'w'}).summary, 'This allows mate in 3 for your opponent.');
+  assert.equal(explainMove({...evidence, viewerSide:'b'}).summary, 'This allows mate in 3 for you.');
   const continuing = {...evidence, beforeScore:{mate:-4}};
   assert.equal(explainMove({...continuing, viewerSide:'w'}).summary, 'You are still facing a forced mate.');
   assert.equal(explainMove({...continuing, viewerSide:'b'}).summary, 'Your opponent is still facing a forced mate.');
@@ -98,14 +98,14 @@ test('rendered explanations follow the known player independently of board orien
       const body=a.call('renderMoveComment');
       assert.equal(body.querySelector('.ip-assessment').textContent, "Your opponent's e5 is an inaccuracy.");
       assert.equal(body.querySelector('.ip-text').textContent,
-        "Your opponent's move gives you a better position." + (mode==='normal' ? ' Your opponent could have played Pawn c5.' : ''));
-      assert.match(body.textContent, /Your opponent could have played Pawn c5/);
+        'This gives you a better position.' + (mode==='normal' ? ' Better was Pawn c5.' : ''));
+      assert.match(body.textContent, /Better was Pawn c5/);
     }
   }
   S.meSide='b';
   const own=a.call('renderMoveComment');
   assert.equal(own.querySelector('.ip-assessment').textContent, 'Your e5 is an inaccuracy.');
-  assert.equal(own.querySelector('.ip-text').textContent, 'Your move gives your opponent a better position.');
+  assert.equal(own.querySelector('.ip-text').textContent, 'This gives your opponent a better position.');
   S.playerKnown=false;
   const spectator=a.call('renderMoveComment');
   assert.equal(spectator.querySelector('.ip-assessment').textContent, 'e5 is an inaccuracy.');
@@ -145,8 +145,8 @@ test('describes promotion and underpromotion without promising the new piece sur
   const before=new Chess('4k3/8/8/8/8/8/p7/4K2R w - - 0 1'), beforeFen=before.fen();
   before.move('Rh2');
   const inputs={beforeFen,afterFen:before.fen(),category:'blunder'};
-  assert.equal(explainMove({...inputs,afterPv:'a2a1q'}).summary, 'Black can reply Pawn a1 (queen), promoting to a queen.');
-  assert.equal(explainMove({...inputs,afterPv:'a2a1n'}).summary, 'Black can reply Pawn a1 (knight), promoting to a knight.');
+  assert.equal(explainMove({...inputs,afterPv:'a2a1q'}).summary, 'This allows Pawn a1 (queen), promoting to a queen.');
+  assert.equal(explainMove({...inputs,afterPv:'a2a1n'}).summary, 'This allows Pawn a1 (knight), promoting to a knight.');
 });
 
 function fromFen(fen, played, extra) {
@@ -157,10 +157,10 @@ function fromFen(fen, played, extra) {
 test('names forks allowed by the reply, including pawn forks and forks with check', () => {
   const knight = fromFen('r3k3/8/8/8/1n6/8/7P/R3K3 w Qq - 0 1', 'h3',
     {category:'blunder', beforeScore:{cp:0}, afterScore:{cp:-500}, afterPv:'b4c2 e1d2 c2a1'});
-  assert.equal(knight.summary, 'Black can reply Knight c2, forking the king and the rook on a1.');
+  assert.equal(knight.summary, 'This allows Knight c2, forking the king and the rook on a1.');
   assert.equal(knight.detail, 'The check must be answered first, leaving the rook on a1 exposed.');
   const pawn = fromFen('4k3/8/8/2n1b3/8/8/3P4/3QK3 b - - 0 1', 'Kd7', {category:'mistake', afterPv:'d2d4'});
-  assert.equal(pawn.summary, 'White can reply Pawn d4, forking the knight on c5 and the bishop on e5.');
+  assert.equal(pawn.summary, 'This allows Pawn d4, forking the knight on c5 and the bishop on e5.');
   assert.equal(pawn.detail, "Black can't move both pieces at once.");
 });
 
@@ -172,39 +172,43 @@ test('a forking piece that can simply be taken is not called a fork', () => {
 
 test('names absolute and relative pins and skewers', () => {
   const pin = explainMove({...position('1. e4 e5 2. Nf3 d6 3. d4', 'Nc6'), category:'inacc', afterPv:'f1b5'});
-  assert.equal(pin.summary, 'White can reply Bishop b5, pinning the knight on c6 to the king.');
+  assert.equal(pin.summary, 'This allows Bishop b5, pinning the knight on c6 to the king.');
   assert.equal(pin.detail, "The pinned knight can't move away without exposing the king.");
   const relative = explainMove({...position('1. d4 d5 2. c4 e6 3. Nc3', 'Nf6'), category:'inacc', afterPv:'c1g5'});
-  assert.equal(relative.summary, 'White can reply Bishop g5, pinning the knight on f6 to the queen on d8.');
+  assert.equal(relative.summary, 'This allows Bishop g5, pinning the knight on f6 to the queen on d8.');
   const skewer = fromFen('K7/8/8/4k3/7r/8/8/R7 b - - 0 1', 'Ke4', {category:'blunder', afterPv:'a1a4 e4e5 a4h4'});
-  assert.equal(skewer.summary, 'White can reply Rook a4, skewering the king and the rook on h4 behind it.');
+  assert.equal(skewer.summary, 'This allows Rook a4, skewering the king and the rook on h4 behind it.');
   assert.match(skewer.detail, /^Once the king steps aside, the rook on h4 can be taken\./);
 });
 
 test('explains loose pieces, removed defenders and captures with a cheaper piece', () => {
   const removed = fromFen('4k3/8/4n3/8/3b4/8/8/3RK3 b - - 0 1', 'Nc5', {category:'blunder', afterPv:'d1d4'});
-  assert.equal(removed.summary, 'White can reply Rook d4, capturing the undefended bishop on d4.');
-  assert.equal(removed.detail, 'Knight c5 left the bishop on d4 without a defender.');
+  // The move that took the last defender away is named as the cause.
+  assert.equal(removed.summary, 'This leaves the bishop on d4 hanging to Rook takes d4.');
+  assert.equal(removed.detail, '');
   const moved = explainMove({...position('1. e4 e5 2. Nf3 Nc6 3. Bc4', 'Nd4'), afterPv:'f3d4'});
-  assert.equal(moved.summary, 'White can reply Knight d4, capturing the knight on d4.');
+  assert.equal(moved.summary, 'This allows Knight takes d4, capturing the knight.');
   const cheap = explainMove({...position('1. e4 e5 2. Nf3', 'Nc6'), afterPv:'f3e5'});
-  assert.match(cheap.summary, /capturing the pawn on e5/);
+  assert.match(cheap.summary, /Knight takes e5, capturing the pawn/);
   const pawnTakes = fromFen('4k3/8/8/3n4/4P3/8/8/4K3 b - - 0 1', 'Ke7', {category:'blunder', afterPv:'e4d5'});
-  assert.equal(pawnTakes.summary, 'White can reply Pawn d5, capturing the undefended knight on d5.');
+  assert.equal(pawnTakes.summary, 'This allows Pawn takes d5, winning the undefended knight.');
   assert.equal(pawnTakes.detail, '');
+  // A piece moved to an unguarded square hangs.
+  const hung = fromFen('4k3/8/8/4p3/8/5N2/8/4K3 w - - 0 1', 'Nd4', {category:'blunder', viewerSide:'w', afterPv:'e5d4'});
+  assert.equal(hung.summary, 'This hangs your knight on d4 to Pawn takes d4.');
 });
 
 test('a capture that also checks mentions both, and discovered and double checks are named', () => {
   const both = explainMove({...position('1. e4 e5 2. Nf3 d6 3. Bc4', 'Be7'), afterPv:'c4f7'});
-  assert.equal(both.summary, 'White can reply Bishop f7, capturing the pawn on f7 with check.');
+  assert.equal(both.summary, 'This allows Bishop takes f7, capturing the pawn with check.');
   // Taken back at once, the same capture only loses a bishop, so it is not the punishment.
   const sacrifice = explainMove({...position('1. e4 e5 2. Nf3 d6 3. Bc4', 'Be7'), afterPv:'c4f7 e8f7 b1c3'});
-  assert.doesNotMatch(sacrifice.summary, /Bishop f7/);
+  assert.doesNotMatch(sacrifice.summary, /Bishop takes f7/);
   const discovered = fromFen('r3k3/8/8/8/4N3/8/8/4R1K1 b - - 0 1', 'Ra7', {category:'blunder', afterPv:'e4c5'});
-  assert.equal(discovered.summary, 'White can reply Knight c5, giving a discovered check.');
+  assert.equal(discovered.summary, 'This allows Knight c5, giving a discovered check.');
   assert.equal(discovered.detail, 'The knight moved out of the way, so the rook on e1 now gives check.');
   const double = fromFen('r3k3/8/8/8/4N3/8/8/4R1K1 b - - 0 1', 'Ra7', {category:'blunder', afterPv:'e4f6'});
-  assert.equal(double.summary, 'White can reply Knight f6, giving double check.');
+  assert.equal(double.summary, 'This allows Knight f6, giving double check.');
 });
 
 test('a forced mate names its distance without spelling out the mating moves', () => {
@@ -232,8 +236,9 @@ test('a miss leads with the tactic that was available, and weak moves name a bet
   assert.equal(miss.detail, '');
   const better = explainMove({...game('1. e4 e5 2. Nf3 Nc6 3. Nxe5', 'a6'),
     beforeScore:{cp:0}, afterScore:{cp:300}, beforePv:'c6e5', afterPv:'d2d4'});
-  assert.equal(better.summary, 'This gives White a much stronger position.');
-  assert.equal(better.detail, 'Better was Knight e5, winning a knight for a pawn.');
+  // The better tactic is the useful part, so it leads.
+  assert.equal(better.summary, 'Better was Knight takes e5, winning a knight for a pawn.');
+  assert.equal(better.detail, '');
 });
 
 test('weak moves without scores still name the strongest reply instead of a vague line', () => {
@@ -316,7 +321,7 @@ test('quiet explanations select a changed, concrete fact for either side', () =>
   assert.match(passer.summary,/passed pawn/);
   const enemy=fromFen('4k3/2p5/8/8/3P4/8/8/4K3 w - - 0 1','d5',{category:'best'});
   assert.doesNotMatch(enemy.summary,/passed pawn/);
-  const connect=fromFen('4k3/7p/8/8/8/8/7P/R2Q1RK1 w - - 0 1','Qd2',{category:'best'});
+  const connect=fromFen('4k3/4p2p/8/8/8/8/7P/R2Q1RK1 w - - 0 1','Qd2',{category:'best'});
   assert.match(connect.summary,/connects the rooks/);
   const defend=fromFen('4k3/1b6/8/8/4P3/8/5P2/3QK3 w - - 0 1','f3',{category:'best'});
   assert.match(defend.summary,/defends the pawn on e4/);
@@ -328,8 +333,8 @@ test('weak moves prioritize the reply and name quiet alternatives without praisi
   assert.equal(result.detail,'Better was Pawn e3.');
   assert.doesNotMatch(result.summary+result.detail,/diagonal|develop/);
   const quiet=explainMove({...position('1. e4 e5','a3'),beforePv:'g1f3',category:'inacc'});
-  assert.equal(quiet.summary,'Better was Knight f3.');
-  assert.match(quiet.detail,/knight develops/);
+  assert.equal(quiet.summary,'Better was Knight f3, developing the knight toward d4 and e5.');
+  assert.equal(quiet.detail,'');
   // A matching played move is never offered as its own improvement.
   const same=explainMove({...position('1. e4 e5','Nf3'),beforePv:'g1f3',category:'inacc'});
   assert.equal(same.alternative,null);
@@ -379,7 +384,7 @@ test('readable move mentions retain legal prefixes and never turn board squares 
   assert.equal(castle.played.category,'good');
   assert.equal(castle.played.origin,'played');
   const ep=explainMove({...position('1. e4 a6 2. e5','d5'),afterPv:'e5d6'});
-  assert.equal(ep.summaryParts.find(part=>part.move).text,'Pawn d6');
+  assert.equal(ep.summaryParts.find(part=>part.move).text,'Pawn takes d6');
   assert.match(ep.summary,/pawn on d5/);
 });
 
@@ -398,15 +403,15 @@ test('a reply is named by the material it wins once the exchange settles', () =>
   const trap = explainMove({...game('1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Nbd7 5. cxd5 exd5', 'Nxd5'),
     category:'blunder', viewerSide:'w', beforeScore:{cp:30}, afterScore:{cp:-350}, beforePv:'e2e3',
     afterPv:'f6d5 g5d8 f8b4 d1d2 b4d2 e1d2 e8d8 e2e4'});
-  assert.equal(trap.summary, 'Your opponent can reply Knight d5, winning a knight for a pawn.');
-  assert.equal(trap.detail, 'You could have played Pawn e3.');
+  assert.equal(trap.summary, 'This allows Knight takes d5, winning a knight for a pawn.');
+  assert.equal(trap.detail, 'Better was Pawn e3.');
   // Counted from where the exchange began, the queen recaptured on d2 is not a queen won.
   const back = explainMove({...game('1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Nbd7 5. cxd5 exd5 6. Nxd5 Nxd5 7. Bxd8 Bb4+ 8. Qd2', 'Bxd2+'),
     category:'best', afterPv:'e1d2 e8d8 e2e4'});
   assert.equal(back.summary, 'This captures the queen on d2 with a bishop, giving check.');
   const knight = explainMove({...game('1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. d3 Be7 5. O-O O-O 6. Re1 d6 7. c3 Be6 8. Bxe6 fxe6 9. Ng5 Qd7', 'Nxe6'),
     category:'blunder', afterPv:'d7e6 d1b3 e6b3 a2b3'});
-  assert.equal(knight.summary, 'Black can reply Queen e6, winning a knight for a pawn.');
+  assert.equal(knight.summary, 'This allows Queen takes e6, winning a knight for a pawn.');
 });
 
 test('a piece taken while the other side takes one back is not called undefended', () => {
@@ -426,4 +431,72 @@ test('an even trade the reply offers falls back to the evaluation and the better
 test('a move out of attack says what it escaped', () => {
   const result = explainMove({...game('1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be3 e5', 'Nb3'), category:'best'});
   assert.equal(result.summary, 'The knight moves to safety from the pawn on e5.');
+});
+
+test('names trapped pieces, discovered attacks and new mate threats', () => {
+  const trap = fromFen('6k1/6p1/7p/8/7B/6P1/8/6K1 b - - 0 1', 'g5', {category:'best'});
+  assert.equal(trap.summary, 'This traps the bishop on h4.');
+  const allowed = fromFen('6k1/6p1/7p/8/7B/6P1/8/7K w - - 0 1', 'Kg2', {category:'mistake', viewerSide:'w', afterPv:'g7g5'});
+  assert.equal(allowed.summary, 'This allows Pawn g5, trapping your bishop on h4.');
+  // A bishop with an open diagonal is attacked, not trapped.
+  const free = fromFen('6k1/6p1/7p/8/7B/8/8/6K1 b - - 0 1', 'g5', {category:'best'});
+  assert.equal(free.summary, 'This attacks the bishop on h4.');
+  const discovered = fromFen('4q1k1/8/8/8/4N3/8/8/4RK2 w - - 0 1', 'Nc3', {category:'best'});
+  assert.equal(discovered.summary, 'This opens a discovered attack on the queen on e8.');
+  const mate = fromFen('6k1/1p3ppp/8/8/8/8/1R3PPP/6K1 w - - 0 1', 'Rd2', {category:'best'});
+  assert.equal(mate.summary, 'This threatens mate on d8.');
+  // A mate that was already on the board is not a new threat.
+  const old = fromFen('6k1/5ppp/8/8/8/8/1R3PPP/6K1 w - - 0 1', 'Rd2', {category:'best'});
+  assert.doesNotMatch(old.summary, /mate/);
+});
+
+test('weak quiet moves name what they gave up', () => {
+  const king = explainMove({...position('1. e4 e5', 'Ke2'), category:'mistake'});
+  assert.equal(king.summary, 'The king move gives up the right to castle.');
+  const back = explainMove({...position('1. e4 e5 2. Nf3 Nc6', 'Ng1'), category:'mistake', beforePv:'f1c4'});
+  assert.equal(back.summary, 'The knight goes back to g1, undoing its development.');
+  assert.match(back.detail, /^Better was Bishop c4/);
+  const shield = fromFen('6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1', 'g4', {category:'inacc', viewerSide:'w'});
+  assert.equal(shield.summary, 'This loosens the pawns in front of your king.');
+  const blocked = explainMove({...position('1. e4 e5 2. Nf3 Nc6', 'Bd3'), category:'inacc'});
+  assert.equal(blocked.summary, 'The bishop on d3 blocks the pawn on d2.');
+});
+
+test('quiet good moves name outposts, escape squares, prophylaxis and the active king', () => {
+  const outpost = fromFen('4k3/8/8/8/4P3/2N5/8/4K3 w - - 0 1', 'Nd5', {category:'best'});
+  assert.equal(outpost.summary, 'The knight settles on d5, where no pawn can chase it.');
+  const luft = fromFen('4r1k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1', 'h3', {category:'best'});
+  assert.equal(luft.summary, 'This gives the king an escape square on h2.');
+  const keep = explainMove({...position('1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. d3 Bc5', 'h3'), category:'best'});
+  assert.equal(keep.summary, 'This keeps the knight on f6 off g4.');
+  const king = fromFen('6k1/5p2/8/8/8/8/5P2/6K1 w - - 0 1', 'Kg2', {category:'best'});
+  assert.equal(king.summary, 'The king steps toward the center for the endgame.');
+  const blockade = fromFen('4k3/8/8/8/3p4/8/8/1N2K3 w - - 0 1', 'Nd2', {category:'best'});
+  assert.doesNotMatch(blockade.summary, /blocks/);
+  const front = fromFen('4k3/8/8/8/3p4/8/8/2N1K3 w - - 0 1', 'Nd3', {category:'best'});
+  assert.equal(front.summary, 'This blocks the passed pawn on d4.');
+});
+
+test('answering a check and near-best moves say something concrete', () => {
+  const step = fromFen('4k3/8/8/8/8/8/8/r3K3 w - - 0 1', 'Ke2', {category:'best'});
+  assert.equal(step.summary, 'The king steps out of check.');
+  const only = fromFen('4k3/8/8/8/8/8/6P1/r6K w - - 0 1', 'Kh2', {category:'best'});
+  assert.equal(only.summary, 'The only legal move.');
+  const block = fromFen('4k3/8/8/8/8/8/3N4/r3K3 w - - 0 1', 'Nb1', {category:'best'});
+  assert.equal(block.summary, 'This blocks the check.');
+  const excellent = explainMove({...position('1. e4 e5', 'h3'), category:'excellent', beforePv:'g1f3'});
+  assert.equal(excellent.summary, 'Stockfish slightly preferred Knight f3.');
+  const good = explainMove({...position('1. e4 e5', 'h3'), category:'good', beforePv:'g1f3'});
+  assert.equal(good.summary, 'Solid, but Knight f3 was stronger.');
+  assert.equal(good.summaryParts.find(part => part.move).move.uci, 'g1f3');
+  const developing = explainMove({...position('1. e4 e5', 'Nc3'), category:'good', beforePv:'g1f3'});
+  assert.equal(developing.detail, 'Knight f3 was stronger.');
+});
+
+test('long explanations shorten the better move before they outgrow two lines', () => {
+  const corpus = [
+    explainMove({...position('1. e4 e5 2. Nf3 Nc6', 'Ng1'), category:'mistake', beforePv:'f1c4'}),
+    explainMove({...position('1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. d3 Bc5', 'Kf1'), category:'inacc', beforePv:'e1g1'}),
+  ];
+  for (const result of corpus) assert.ok((result.summary + ' ' + result.detail).length <= 104, result.summary + ' ' + result.detail);
 });
