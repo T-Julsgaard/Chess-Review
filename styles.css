@@ -1586,7 +1586,9 @@ button { font-family: inherit; cursor: pointer; }
 /* A quiet liquid surface: one selected destination that flows between tabs. */
 .acc-navigation { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(3,minmax(0,1fr));
   flex: none; gap: 0; margin: 4px 8px 0; padding: 4px; min-height: 36px; border: 1px solid var(--line-soft);
-  border-radius: 13px; background: color-mix(in srgb,var(--panel-2) 72%,var(--panel)); }
+  border-radius: 13px; background: color-mix(in oklab,var(--bg) 78%,var(--panel));
+  /* Pressed a shade into the panel, like the Playstyle setup's choices. */
+  box-shadow: inset 0 1px 3px color-mix(in oklab,#000 28%,transparent), 0 1px 0 color-mix(in oklab,#fff 4%,transparent); }
 .acc-navigation button { position: relative; z-index: 1; display: grid; place-items: center; min-width: 0; min-height: 28px;
   padding: 6px 2px; border: 0; border-radius: 9px; background: transparent; color: var(--ink-3);
   font: 650 11px/1.25 var(--font-ui); cursor: pointer; transition: color .18s ease; -webkit-tap-highlight-color: transparent; }
