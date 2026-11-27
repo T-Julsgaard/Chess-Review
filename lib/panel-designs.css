@@ -126,6 +126,54 @@
 .accuracy-phase-modern-v2 .phase-rating-values .acc-elo:first-child { --rating-color: var(--accent); }
 .accuracy-phase-modern-v2 .phase-rating-values .acc-elo::after { content: ''; position: absolute; bottom: -4px; left: 24%; right: 24%; height: 1px;
   background: linear-gradient(90deg,transparent,color-mix(in srgb,var(--rating-color) 60%,transparent),transparent); }
+/* Default version 3: Default's layout (its compact arrangement included) with
+   gauge dials, metered phase cards and rating badges. Figures use Sora, bundled
+   for move badges, with even-width digits so the count-up stays still. */
+.accuracy-phase-gauge { --gauge-font: "Badge Sora", var(--font-ui); }
+.accuracy-phase-gauge .acc-dial { isolation: isolate; }
+.accuracy-phase-gauge .acc-dial::before { content: ''; position: absolute; inset: 14%; z-index: -1; border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%,color-mix(in srgb,var(--score-color) 17%,transparent),transparent 70%); }
+.accuracy-phase-gauge .acc-dial circle { stroke-width: 7; }
+.accuracy-phase-gauge .acc-dial .acc-dial-track { stroke: color-mix(in srgb,var(--score-color) 15%,var(--line-soft)); stroke-linecap: butt; }
+.accuracy-phase-gauge .acc-dial .acc-dial-fill { filter: drop-shadow(0 0 5px color-mix(in srgb,var(--score-color) 45%,transparent)); }
+.accuracy-phase-gauge .acc-gauge-stop-start { stop-color: color-mix(in srgb,var(--score-color) 40%,var(--panel)); }
+.accuracy-phase-gauge .acc-gauge-stop-end { stop-color: var(--score-color); }
+.accuracy-phase-gauge .acc-dial .acc-gauge-thumb { fill: var(--panel); stroke: var(--score-color); stroke-width: 3.2;
+  filter: drop-shadow(0 0 4px color-mix(in srgb,var(--score-color) 60%,transparent)); transition: opacity .35s ease; }
+/* The thumb appears where the score lands once the count-up has finished. */
+.accuracy-phase-gauge[data-revealing] .acc-gauge-thumb { opacity: 0; transition: none; }
+.stage .accuracy-phase-gauge .phase-overall-values .acc-val { font-family: var(--gauge-font); font-weight: 700;
+  font-size: clamp(21px,9.4cqw,27px); letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.accuracy-phase-gauge .phase-summary-label { color: var(--ink-2); font-weight: 650; }
+.accuracy-phase-gauge .phase-report-name { color: var(--ink-2); font-weight: 600; }
+.accuracy-phase-gauge .phase-report-name::before { background: linear-gradient(90deg,transparent,var(--line)); }
+.accuracy-phase-gauge .phase-report-name::after { background: linear-gradient(90deg,var(--line),transparent); }
+.accuracy-phase-gauge .phase-report-cell { gap: 5px; padding: 6px 3px 7px; border-radius: 9px;
+  border-color: color-mix(in srgb,var(--phase-color) 30%,var(--line-soft));
+  background: linear-gradient(180deg,color-mix(in srgb,var(--phase-color) 13%,var(--panel)),color-mix(in srgb,var(--phase-color) 4%,var(--panel)));
+  box-shadow: inset 0 1px 0 color-mix(in srgb,var(--phase-color) 16%,transparent);
+  transition: border-color .2s ease, box-shadow .2s ease; }
+/* The stronger side of each phase glows a little brighter. */
+.accuracy-phase-gauge .phase-report-cell.phase-lead { border-color: color-mix(in srgb,var(--phase-color) 62%,var(--line-soft));
+  box-shadow: inset 0 1px 0 color-mix(in srgb,var(--phase-color) 26%,transparent), 0 5px 16px -8px color-mix(in srgb,var(--phase-color) 75%,transparent); }
+.accuracy-phase-gauge .phase-report-cell.unavailable { border-color: var(--line-soft); background: var(--panel-2); box-shadow: none; }
+.accuracy-phase-gauge .phase-report-score { font-family: var(--gauge-font); font-weight: 700; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+.accuracy-phase-gauge .phase-meter { display: block; width: 74%; height: 4px; overflow: hidden; border-radius: 4px;
+  background: color-mix(in srgb,var(--phase-color) 15%,var(--line-soft)); }
+.accuracy-phase-gauge .phase-meter > i { display: block; height: 100%; border-radius: inherit;
+  background: linear-gradient(90deg,color-mix(in srgb,var(--phase-color) 50%,var(--panel)),var(--phase-color)); }
+.accuracy-phase-gauge .phase-report-cell.unavailable .phase-meter { opacity: .45; }
+.accuracy-phase-gauge .phase-rating { position: relative; border-top: 0; }
+.accuracy-phase-gauge .phase-rating::before { content: ''; position: absolute; top: 0; left: 6%; right: 6%; height: 1px;
+  background: linear-gradient(90deg,transparent,var(--line),transparent); }
+.accuracy-phase-gauge .phase-rating > .acc-elo-label { color: var(--ink-2); }
+.accuracy-phase-gauge .phase-rating-values .acc-elo { --rating-color: var(--ink-2); justify-self: center; box-sizing: border-box; min-width: 78%;
+  padding: 4px 12px 5px; border: 1px solid color-mix(in srgb,var(--rating-color) 28%,var(--line-soft)); border-radius: 999px;
+  background: linear-gradient(180deg,color-mix(in srgb,var(--rating-color) 13%,var(--panel)),color-mix(in srgb,var(--rating-color) 4%,var(--panel)));
+  font-family: var(--gauge-font); font-weight: 700; font-size: 19px; letter-spacing: -.02em; text-align: center;
+  font-variant-numeric: tabular-nums; color: var(--rating-color); white-space: nowrap; }
+.accuracy-phase-gauge .phase-rating-values .acc-elo:first-child { --rating-color: var(--accent);
+  box-shadow: 0 5px 16px -9px color-mix(in srgb,var(--accent) 80%,transparent); }
 /* Overview player cards keep names prominent and aligned with their scores. */
 .accuracy-panel :is(.acc-page-overview,.acc-page-quality,.acc-page-advanced) .acc-players { align-items: stretch; margin-bottom: 6px; }
 .accuracy-panel :is(.acc-page-overview,.acc-page-quality,.acc-page-advanced) .acc-player { gap: 7px; padding: 5px 6px; border: 1px solid var(--line-soft);
@@ -343,3 +391,13 @@
 .stage .mod .accuracy-panel .acc-fit-page.acc-fit-scroll { overflow-y: auto; scrollbar-width: none;
   mask-image: linear-gradient(180deg, #000 calc(100% - 22px), transparent); }
 .stage .mod .accuracy-panel .acc-fit-page.acc-fit-scroll::-webkit-scrollbar { display: none; }
+/* Default version 3 in the compact and tight arrangements: thinner meters and
+   badges, figures sized for Sora's wider digits. */
+.stage .accuracy-phase-gauge .acc-compact .phase-overall-values .acc-val { font-size: calc(var(--acc-dial, 64px) * .225); }
+.stage .accuracy-phase-gauge .acc-compact .phase-report-cell { gap: 4px; }
+.stage .accuracy-phase-gauge .acc-compact .phase-meter { height: 3px; }
+.stage .accuracy-phase-gauge .acc-compact .phase-rating-values .acc-elo { min-width: 0; width: 100%; padding-block: 2px 3px; }
+.stage .accuracy-phase-gauge .acc-compact-tight .phase-overall-values .acc-val { font-size: 20px; }
+.stage .accuracy-phase-gauge .acc-compact-tight .phase-report-cell { gap: 2px; }
+.stage .accuracy-phase-gauge .acc-compact-tight .phase-meter { height: 2px; }
+.stage .accuracy-phase-gauge .acc-compact-tight .phase-rating-values .acc-elo { padding-block: 0 1px; }

@@ -24,7 +24,7 @@ function measure(doc, height, {base = 300, growth = 60} = {}) {
 
 test('Default version 2 is offered between Default and Original and survives a reload', async t => {
   const accuracy = PANEL_DESIGNS.find(design => design.panel === 'accuracy');
-  assert.deepEqual(accuracy.versions.map(version => version.label), ['Default', 'Default version 2', 'Original']);
+  assert.deepEqual(accuracy.versions.map(version => version.label), ['Default', 'Default version 2', 'Default version 3', 'Original']);
   assert.equal(accuracy.versions[1].id, 'phases-compact');
   const settings = {accuracyDesign: 'phases-compact'};
   normalizePanelDesigns(settings);
