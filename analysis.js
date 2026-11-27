@@ -492,9 +492,12 @@ const HANDLE_SVG = `<svg viewBox="0 0 16 16" width="14" height="14" fill="curren
 const LAYOUT_GRIDS = [[16, 'Standard'], [8, 'Fine'], [2, 'Extra fine']];
 const MINW = 170;        // minimum module width (px)
 const MINH = 56;         // minimum module height (px)
-// Per-module width floors that override MINW — the eval bar is a thin strip, so it may go narrow.
-const MOD_MINW = { evalbar: 16 };
+// Per-module floors that override MINW/MINH — the eval bar is a thin strip, so it may go narrow,
+// and the coach portrait has no text to keep readable, so it may shrink to a small figure.
+const MOD_MINW = { evalbar: 16, coach: 32 };
+const MOD_MINH = { coach: 32 };
 const modMinW = (key) => MOD_MINW[key] ?? MINW;
+const modMinH = (key) => MOD_MINH[key] ?? MINH;
 
 const ICONS = {
   globe: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg>`,
@@ -2448,7 +2451,7 @@ function makeMovable(mod, handle, grips, key) {
       }else{
         const b={...box};
         if(kind.includes('e'))b.w=snapPanelEdge(box.x,box.w,dx,modMinW(key));
-        if(kind.includes('s'))b.h=snapPanelEdge(box.y,box.h,dy,MINH);
+        if(kind.includes('s'))b.h=snapPanelEdge(box.y,box.h,dy,modMinH(key));
         S.layout={...start,[key]:b};
       }
       applyLayout();growCanvas();if(keys.includes('board'))alignPlayers();
@@ -4486,6 +4489,15 @@ function renderCoachAvatar({ animate = false } = {}) {
   frame.addEventListener("load", () => {
     if (_coachFrame !== frame) return;   // a removed portrait may finish loading after a switch
     _coachReady = true;
+    // Each rig page carries demo buttons (emotions, gestures, gaze) under its portrait and caps the
+    // portrait's width. Embedded, the review drives the coach, so hide those buttons and let the
+    // figure keep filling the panel however large it is resized.
+    try {
+      const doc = frame.contentDocument;
+      if (doc?.head) doc.head.append(Object.assign(doc.createElement("style"), {
+        textContent: ".coach-ctrl{display:none!important}.coach-svg{max-width:none!important}",
+      }));
+    } catch { /* A rig that cannot be styled still works; its buttons stay below the fold. */ }
     frame.classList.add("ready");   // fade the portrait in now that its document has loaded
 
     coachSend({ coachCmd: "look", value: "center" });
