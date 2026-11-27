@@ -13,7 +13,7 @@ const scores = (plies) => gameStatistics(positions, [], Object.fromEntries(['w',
   [side, {moves: plies.filter(ply => positions[ply].color === side).map(ply =>
     ({ply, eligible: true, engine: 'nnue', quality: 90}))}])));
 
-for (const design of ['dials', 'phases-modern', 'phases-modern-v2', 'phases-compact', 'phases-gauge']) {
+for (const design of ['dials', 'phases-modern', 'phases-modern-v2', 'phases-compact', 'phases-gauge', 'phases-band']) {
   test(`${design} counts up each completed phase without interrupting earlier reveals`, t => {
     const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6');
     a.call('computeDerived'); a.call('buildUI');
@@ -62,7 +62,7 @@ test('turning animations off settles an in-progress phase reveal', async t => {
   assert.equal(a.dom.window.document.querySelector('[data-phase="opening"] strong').textContent, '90.0');
 });
 
-for (const design of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-modern', 'phases-modern-v2', 'phases-compact', 'phases-gauge']) {
+for (const design of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-modern', 'phases-modern-v2', 'phases-compact', 'phases-gauge', 'phases-band']) {
   test(`${design} reveals completed phases in order while preserving loaders, tabs and focus`, t => {
     const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6');
     a.call('computeDerived'); a.call('buildUI');

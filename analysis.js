@@ -5179,7 +5179,9 @@ function accuracyPager() {
 }
 // Default version 3 sets the overall score as a large whole number with a smaller
 // decimal ("85" ".2"). Its text stays "85.2" for screen readers and the reveal.
-function accuracyDial(value, busy, split = false) {
+// Version 4 also colours the ring and number by the score's performance band,
+// the colours the phase cards use.
+function accuracyDial(value, busy, {split = false, banded = false} = {}) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 120 120');
   svg.setAttribute('aria-hidden', 'true');
@@ -5192,7 +5194,9 @@ function accuracyDial(value, busy, split = false) {
   }
   const text = value == null ? '—' : value >= 100 ? '100' : value.toFixed(1);
   const [whole, decimal] = text.split('.');
-  return el('div', {class: 'acc-dial'}, svg,
+  const band = banded && !busy ? phasePerformance(value) : null;
+  return el('div', {class: 'acc-dial', 'data-phase-category': band?.category || null,
+    style: band ? {'--score-color': QUALITY[band.category].color} : null}, svg,
     busy ? loaderNode('acc-val', 'var(--accent)') : split && decimal
       ? el('strong', {class: 'acc-val acc-val-split'}, el('span', {class: 'acc-val-whole'}, whole), el('span', {class: 'acc-val-decimal'}, '.' + decimal))
       : el('strong', {class: 'acc-val'}, text),
@@ -5433,8 +5437,10 @@ function renderModernAdvanced(sides, busy) {
 }
 // Modern overviews share their Quality and Advanced pages. "Default version 2"
 // (phases-compact) always uses the compact overview that short panels get.
-// "Default version 3" (phases-gauge) is Default with restyled overall scores.
-const MODERN_ACCURACY_DESIGNS = ['phases-modern', 'phases-modern-v2', 'phases-compact', 'phases-gauge'];
+// "Default version 3" (phases-gauge) is Default with restyled overall scores;
+// "Default version 4" (phases-band) also colours them by performance band.
+const MODERN_ACCURACY_DESIGNS = ['phases-modern', 'phases-modern-v2', 'phases-compact', 'phases-gauge', 'phases-band'];
+const SPLIT_SCORE_DESIGNS = ['phases-gauge', 'phases-band'];
 function renderStats() {
   const design = panelDesign('accuracy', S.settings);
   const phaseReport2 = design === 'phases2';
@@ -5521,7 +5527,7 @@ function renderStats() {
   }
   if (livePhases) content.querySelector('.acc-phases,.phase-report')?.replaceWith(livePhases);
   const fitPage = phaseModern && page < 2;
-  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : '') + (design === 'phases-modern-v2' ? ' accuracy-phase-modern-v2' : '') + (design === 'phases-compact' ? ' accuracy-phase-compact' : '') + (design === 'phases-gauge' ? ' accuracy-phase-gauge' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
+  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : '') + (design === 'phases-modern-v2' ? ' accuracy-phase-modern-v2' : '') + (design === 'phases-compact' ? ' accuracy-phase-compact' : '') + (SPLIT_SCORE_DESIGNS.includes(design) ? ' accuracy-phase-gauge' : '') + (design === 'phases-band' ? ' accuracy-phase-band' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
     accuracyPager(),
     el('div', {class: 'panel-body acc-page' + (fitPage ? ' acc-fit-page' : '') + (page === 0 ? ' acc-page-overview' : phaseModern ? page === 1 ? ' acc-page-quality' : ' acc-page-advanced' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
       'aria-labelledby': 'accuracy-tab-' + page}, ...(fitPage ? [el('div', {class: 'acc-fit-content'}, players, content)] : [players, content]))));
@@ -5686,7 +5692,8 @@ function renderPhaseOverview(sides, busy, modern = false) {
   return el('div', {class: 'phase-overview'},
     el('div', {class: 'phase-summary'},
       el('span', {class: 'phase-summary-label'}, 'Accuracy'),
-      el('div', {class: 'phase-overall-values'}, ...sides.map(side => modern ? accuracyDial(S.acc[side], busy, panelDesign('accuracy', S.settings) === 'phases-gauge')
+      el('div', {class: 'phase-overall-values'}, ...sides.map(side => modern ? accuracyDial(S.acc[side], busy, {
+        split: SPLIT_SCORE_DESIGNS.includes(panelDesign('accuracy', S.settings)), banded: panelDesign('accuracy', S.settings) === 'phases-band'})
         : busy ? loaderNode('acc-val', 'var(--accent)')
         : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side] >= 100 ? '100' : S.acc[side].toFixed(1))))),
     renderPhaseReport(sides, busy),

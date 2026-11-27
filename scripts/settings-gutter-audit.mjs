@@ -55,7 +55,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       await invoke(function(section){const head=[...this.document.querySelectorAll('.set-sect-head')].find(n=>n.textContent===section);if(head.getAttribute('aria-expanded')!=='true')head.click();head.scrollIntoView({block:'start'});},section);
       if (section==='Tabs') {
         const choices=await run(`Object.fromEntries([...document.querySelectorAll('.set-section.open .set-dropdown')].map(field=>[field.querySelector('.lib-dd-btn').dataset.setting,[...field.querySelectorAll('.lib-dd-opt')].map(n=>n.textContent)]))`);
-        assert.deepEqual(choices.accuracyDesign,['Default','Default version 2','Default version 3','Original']);
+        assert.deepEqual(choices.accuracyDesign,['Default','Default version 2','Default version 3','Default version 4','Original']);
         assert.equal(choices.accuracyQualityDesign,undefined);
         assert.deepEqual(choices.engineDesign,['Default','Original']);
         assert.deepEqual(choices.graphDesign,['Default','Original','Timeline','Colored bars']);

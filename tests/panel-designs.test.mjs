@@ -21,7 +21,7 @@ test('Visual > Tabs offers compact dropdowns for Accuracy and Move list designs'
   const labels = [...section().querySelectorAll('.set-lbl')].map(node => node.textContent);
   assert.ok(labels.includes('Accuracy overview'));
   assert.ok(!labels.includes('Accuracy move quality'), 'Move quality has a single design and no setting');
-  assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Default', 'Default version 2', 'Default version 3', 'Original']);
+  assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Default', 'Default version 2', 'Default version 3', 'Default version 4', 'Original']);
   assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyAdvancedDesign"]')].map(node => node.textContent), []);
   assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="movesDesign"]')].map(node => node.textContent), ['Default', 'Original', 'Edge-to-edge', 'Large text']);
   const option = section().querySelector('[data-setting="accuracyDesign"][data-value="original"]');

@@ -13,7 +13,7 @@ function review(t) {
 
 test('Default version 3 is offered after Default version 2 and survives a reload', async t => {
   const accuracy = PANEL_DESIGNS.find(design => design.panel === 'accuracy');
-  assert.deepEqual(accuracy.versions.map(version => version.label), ['Default', 'Default version 2', 'Default version 3', 'Original']);
+  assert.deepEqual(accuracy.versions.map(version => version.label), ['Default', 'Default version 2', 'Default version 3', 'Default version 4', 'Original']);
   assert.equal(accuracy.versions[2].id, 'phases-gauge');
   const settings = {accuracyDesign: 'phases-gauge'};
   normalizePanelDesigns(settings);
@@ -84,4 +84,43 @@ test('the overview reveal counts a split score up in its own two sizes', () => {
   frames.shift()(1200);
   assert.equal(value.innerHTML, '<span class="acc-val-whole">85</span><span class="acc-val-decimal">.2</span>');
   assert.equal(panel.hasAttribute('data-revealing'), false);
+});
+
+test('Default version 4 colours each overall score by its performance band, like the phase cards', async t => {
+  const accuracy = PANEL_DESIGNS.find(design => design.panel === 'accuracy');
+  assert.equal(accuracy.versions[3].id, 'phases-band');
+  assert.equal(accuracy.versions[3].label, 'Default version 4');
+  const a = review(t), doc = a.dom.window.document;
+  await a.call('applyUiSetup', 'modern');
+  await a.call('setSetting', 'accuracyDesign', 'phases-gauge');
+  const v3 = doc.querySelector('.phase-overview').cloneNode(true);
+  assert.equal(v3.querySelector('.acc-dial').style.getPropertyValue('--score-color'), '', 'Version 3 keeps the player colours');
+
+  await a.call('setSetting', 'accuracyDesign', 'phases-band');
+  const panel = doc.querySelector('.accuracy-panel');
+  assert.ok(panel.matches('.accuracy-phase-modern.accuracy-phase-gauge.accuracy-phase-band'), 'Version 3 with colour');
+  const strip = node => { const copy = node.cloneNode(true); copy.querySelector('.phase-summary').remove(); return copy.innerHTML; };
+  assert.equal(strip(doc.querySelector('.phase-overview')), strip(v3), 'Phases and ratings are unchanged');
+
+  const colours = () => [...doc.querySelectorAll('.phase-summary .acc-dial')].map(dial => [dial.dataset.phaseCategory, dial.style.getPropertyValue('--score-color')]);
+  for (const [w, b, expected] of [
+    [84.3, 71.6, [['good', 'var(--q-good)'], ['inacc', 'var(--q-inacc)']]],
+    [93.4, 58.1, [['excellent', 'var(--q-excellent)'], ['mistake', 'var(--q-mistake)']]],
+    [42, 90, [['blunder', 'var(--q-blunder)'], ['excellent', 'var(--q-excellent)']]],
+  ]) {
+    a.state.acc = {w, b}; a.call('renderStats');
+    assert.deepEqual(colours(), expected);
+    assert.ok(doc.querySelector('.phase-summary .acc-val-split'), 'Keeps Version 3\'s split number');
+  }
+  // Same bands as the phase cards.
+  a.state.gameStats.w.phases.opening = {accuracy: 71.6, decisions: 6}; a.state.acc = {w: 71.6, b: 50}; a.call('renderStats');
+  assert.equal(doc.querySelector('.phase-report-cell').dataset.phaseCategory, colours()[0][0]);
+  // No score or still analysing: the usual player colours.
+  a.state.acc = {w: null, b: 80}; a.call('renderStats');
+  assert.deepEqual(colours()[0], [undefined, '']);
+  a.state.analyzing = true; a.call('renderStats');
+  assert.deepEqual(colours(), [[undefined, ''], [undefined, '']]);
+  a.state.analyzing = false;
+  await a.call('setSetting', 'accuracyDesign', 'phases-modern');
+  assert.equal(doc.querySelector('.accuracy-phase-band,[data-phase-category].acc-dial'), null);
 });
