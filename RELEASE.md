@@ -1,8 +1,9 @@
-# Release 0.5.1
+# Release 0.6.0
 
-0.5.1 is the release after 0.4.0 (released October 27, 2026). The one-time steps
-below keep 0.5.0 as their minimum version, so they run for 0.5.1 and for anyone
-who installed an earlier 0.5.0 build. It returns every tab style in
+0.6.0 follows 0.5.1 (released November 9, 2026) and adds no new one-time settings
+step. Users updating from 0.5.1 keep all their settings. The 0.5.0 step below keeps
+0.5.0 as its minimum version and marker, so it still runs once for anyone updating
+from 0.4.0 or older, or from an early 0.5.0 build. It returns every tab style in
 **Settings → Visual → Tabs** to its default once (Evaluation, Engine, Accuracy
 overview, Accuracy move quality, Move list and the Flat v2 Evaluation bar), using
 the `tabStylesResetFor050` marker in `release-settings.js`. Nothing else changes:
@@ -61,9 +62,9 @@ Compatibility** and remove any Android compatibility override on the currently
 listed version. A local manifest change does not edit an already published listing.
 
 Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
-Each build creates a new `web-ext-artifacts/release-0.5.1-<unique>/` directory.
-It preserves `chess-review-0.5.1-chrome.zip`, `chess-review-0.5.1-firefox.zip`, and
-`chess-review-0.5.1-source.zip`, alongside staged copies. Existing packages are
+Each build creates a new `web-ext-artifacts/release-0.6.0-<unique>/` directory.
+It preserves `chess-review-0.6.0-chrome.zip`, `chess-review-0.6.0-firefox.zip`, and
+`chess-review-0.6.0-source.zip`, alongside staged copies. Existing packages are
 never overwritten. `release-record.json` records SHA-256 checksums, source-file
 hashes, the Git HEAD and working-tree status, Node version, and build time.
 `web-ext-artifacts/latest-release.json` points to the newest completed record;
@@ -119,16 +120,16 @@ reviews with both engines.
 Validate the actual Firefox ZIP with:
 
 ```sh
-npx web-ext lint --source-dir=web-ext-artifacts/release-0.5.1-<unique>/chess-review-0.5.1-firefox.zip
+npx web-ext lint --source-dir=web-ext-artifacts/release-0.6.0-<unique>/chess-review-0.6.0-firefox.zip
 ```
 
 Chrome uses an MV3 module service worker. Firefox uses an MV3 module event page.
 Store packages omit the other browser's background declaration. The development
 manifest includes both so the project can be loaded directly in either browser.
 
-Before uploading, confirm 0.5.1 is greater than the latest uploaded version in both
+Before uploading, confirm 0.6.0 is greater than the latest uploaded version in both
 store dashboards. Upload through the existing Chrome and Firefox listings and keep
-the Firefox extension ID from `manifest.json`; 0.5.1 does not change it. Since 0.4.0
+the Firefox extension ID from `manifest.json`; 0.6.0 does not change it. Since 0.4.0
 the Chrome package adds the `offscreen` permission (Firefox does not need it), so the
 Chrome dashboard asks for a justification on the Privacy practices tab; see
 Reviewer notes. Keeping the existing extension identity preserves installed
@@ -148,8 +149,8 @@ evidence, not platform permission, independently validated move labels or rights
 to third-party assets. ATTRIBUTIONS.md records current asset provenance and limitations. Platform integration and applicable terms still need review;
 a generated ZIP is not legal clearance. The Chrome store download checked on
 October 3, 2026 was version 0.2.0; the Firefox public listing was unavailable at
-that check. The maintainer reports 0.4.0 is currently released (October 27, 2026).
-Version 0.5.1 is prepared for the maintainer's store upload.
+that check. The maintainer reports 0.5.1 is currently released (November 9, 2026).
+Version 0.6.0 is prepared for the maintainer's store upload.
 
 ## Reviewer notes
 
@@ -167,7 +168,10 @@ and fetch public games. offscreen (Chrome only) opens a hidden extension page,
 preview.html, with the WORKERS reason to run the bundled engine for the accuracy
 preview on the review button of a finished game. A Chrome service worker cannot
 start that WebAssembly worker itself. The page shows nothing, sends nothing, and
-closes when no preview is queued. Update the Chrome privacy form to match PRIVACY.md; do not
+closes when no preview is queued. Since 0.6.0 a content script,
+profile-viewer-content.js, also runs on
+`https://t-julsgaard.github.io/Chess-Review/profile/*`, the project's own shared
+profile page described in PRIVACY.md. Update the Chrome privacy form to match PRIVACY.md; do not
 claim that no lookup identifiers ever leave the device.
 
 ### Bundled libraries
