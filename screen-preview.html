@@ -12,7 +12,9 @@
       <div id="preview-surface"><iframe id="preview-app" title="Chess Review at the selected screen size"></iframe></div>
     </main>
     <section id="preview-settings" aria-label="Screen setup" hidden>
-      <div class="preview-heading"><div><strong>Screen setup</strong><span>Chess Review</span></div><button id="close-settings" type="button" aria-label="Close screen setup">Done</button></div>
+      <div id="resize-settings" role="separator" tabindex="0" aria-label="Resize screen setup" aria-orientation="vertical" title="Drag to resize · arrow keys also work"></div>
+      <div class="preview-heading"><div><strong>Screen setup</strong><span>Chess Review</span></div><div class="preview-heading-actions"><button id="minimize-settings" type="button" aria-controls="preview-settings-body" aria-expanded="true" aria-label="Minimize screen setup" title="Minimize">–</button><button id="close-settings" type="button" aria-label="Close screen setup">Done</button></div></div>
+      <div id="preview-settings-body">
       <nav id="device-tabs" aria-label="Screen type"></nav>
       <div class="preview-controls">
         <label class="preset-label">Preset <select id="screen-preset"></select></label>
@@ -34,6 +36,7 @@
         <p>Presets assume 100% browser zoom. Maximized mode uses this window to estimate space for browser controls and the taskbar.</p>
       </div>
       <p>Current copies the viewport from the window that opened this preview. For an exact layout match, enter the target browser’s viewport dimensions in CSS pixels.</p>
+      </div>
     </section>
     <footer id="preview-toolbar" aria-label="Preview controls">
       <button id="toggle-settings" type="button" aria-controls="preview-settings" aria-expanded="false">Screen setup</button>

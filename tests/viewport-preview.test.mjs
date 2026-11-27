@@ -66,6 +66,33 @@ test('setup overlays and hiding controls preserve the live viewport and restore 
   assert.equal($('fullscreen-preview').hidden,true,'Unsupported fullscreen is hidden');
 });
 
+test('screen setup minimizes to its title bar, resizes from its grip and remembers both',t=>{
+  const dom=previewDOM(t);
+  const doc=dom.window.document,$=id=>doc.getElementById(id);
+  const {frame}=mountViewportPreview(doc),source=frame.src,settings=$('preview-settings');
+  $('toggle-settings').click();
+  assert.equal(settings.classList.contains('minimized'),false);
+  $('minimize-settings').click();
+  assert.equal(settings.classList.contains('minimized'),true);
+  assert.equal($('minimize-settings').getAttribute('aria-expanded'),'false');
+  assert.equal($('minimize-settings').getAttribute('aria-label'),'Expand screen setup');
+  assert.equal(settings.hidden,false,'Minimizing keeps the panel open');
+  settings.getBoundingClientRect=()=>({width:parseFloat(settings.style.width)||480,height:parseFloat(settings.style.height)||330});
+  $('resize-settings').dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'ArrowLeft'}));
+  $('resize-settings').dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'ArrowUp',shiftKey:true}));
+  assert.equal(settings.style.width,'500px');assert.equal(settings.style.height,'390px');
+  assert.deepEqual(JSON.parse(dom.window.localStorage.getItem('screen-preview-panel')),{minimized:true,width:500,height:390});
+  const again=previewDOM(t);
+  again.window.localStorage.setItem('screen-preview-panel',dom.window.localStorage.getItem('screen-preview-panel'));
+  mountViewportPreview(again.window.document);
+  const restored=again.window.document.getElementById('preview-settings');
+  assert.equal(restored.classList.contains('minimized'),true);assert.equal(restored.style.width,'500px');
+  $('resize-settings').dispatchEvent(new dom.window.MouseEvent('dblclick'));
+  assert.equal(settings.style.width,'');assert.equal(settings.style.height,'');
+  $('minimize-settings').click();
+  assert.equal(settings.classList.contains('minimized'),false);assert.equal(frame.src,source);
+});
+
 test('fullscreen uses the whole viewer, hides controls, handles exit and reports rejection',async t=>{
   const dom=previewDOM(t);
   const doc=dom.window.document,$=id=>doc.getElementById(id);
