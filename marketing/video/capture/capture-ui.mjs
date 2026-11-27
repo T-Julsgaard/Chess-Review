@@ -327,8 +327,8 @@ try {
       extra: () => ({ marks }),
       async onFrame(i) {
         if (marks.ready != null || i <= 51) return;
-        const status = await page.evaluate(() => document.querySelector('.practice-status')?.textContent || '');
-        if (!status.startsWith('Find')) { if (i > LIMIT - 400) throw Error(`practice never asked for a move: "${status}"`); return; }
+        const status = await page.evaluate(() => document.getElementById('controls')?.dataset.practice || '');
+        if (status !== 'solving') { if (i > LIMIT - 400) throw Error(`practice never asked for a move: "${status}"`); return; }
         // The same beats as before relative to the board taking moves: 6 frames' pause,
         // 54 to reach the rook, a 50-frame drag, then the board resets about 40 frames later.
         const r = marks.ready = i;

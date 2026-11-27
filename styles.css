@@ -1500,7 +1500,10 @@ button { font-family: inherit; cursor: pointer; }
 .controls .pos { margin: 0 6px; color: var(--ink-3); font-size: 12px; font-family: var(--font-mono); }
 /* mistake-practice status text in the controls bar */
 .controls .practice-pos { color: var(--ink-2); font-weight: 700; font-family: var(--font-ui); }
-.controls .practice-status { color: var(--ink-3); font-size: 13px; margin-right: 4px; }
+/* Hint sits beside Exit; lit (accent) while the hint is showing or queued for the next turn. */
+/* (#controls so it outranks the layout presets' `.stage.… .controls button` rules.) */
+#controls .practice-hint { padding: 0 12px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+#controls .practice-hint.on { color: var(--accent); border-color: var(--accent); background: color-mix(in oklab, var(--accent) 18%, var(--panel-2)); }
 
 /* ---------- REVIEW SUMMARY ---------- */
 .review {
@@ -2469,16 +2472,6 @@ button { font-family: inherit; cursor: pointer; }
   padding: 10px 2px; font-family: var(--font-ui); font-size: 18px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 /* the loader scales to font-size; pin it to the Accuracy panel's loader size (.acc-val = 30px) */
 .ip-analyzing .ld { font-size: 30px; }
-.ip-hint-btn {
-  align-self: flex-start; margin-top: 2px;
-  padding: 7px 14px; border-radius: 9px; font-size: 13px; font-weight: 700;
-  color: var(--ink); background: var(--panel-2); border: 1px solid var(--line);
-  transition: border-color .14s, background .14s;
-}
-.ip-hint-btn:hover { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 20%, var(--panel-2)); }
-/* Keep the hint button compact and aligned with the coach's invitation. */
-.ip-hint-inline { margin-top: 0; padding: 4px 11px; font-size: 12px; vertical-align: middle; }
-.ip-hint-inline.on { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 22%, var(--panel-2)); color: var(--accent); }
 
 /* practice hint: light up just the square of the piece to move — same red as a right-click mark */
 .sq.hint-from::after {

@@ -99,31 +99,71 @@ test('repeated incorrect attempts replay the full board shake and red flashes al
   t.mock.timers.tick(320);assert.equal(board.querySelector('.puzzle-result-badge'),null);
 });
 
-test('the first wrong practice move offers one working Hint button inside the coach message',t=>{
+test('the Hint button sits beside Exit and works before any attempt; the coach asks for a stronger move',t=>{
   const a=practice(t),doc=a.dom.window.document;
-  a.call('renderReview');
-  assert.equal(doc.querySelector('.practice-coach .ip-hint-btn'),null);
-  a.call('practiceAttempt','e2','e5');
-  assert.equal(doc.querySelector('.practice-coach .ip-hint-btn'),null);
-  a.call('practiceAttempt','d2','d4');
+  a.call('renderControls');a.call('renderReview');
   const coach=doc.querySelector('.practice-coach');
-  assert.equal(coach.querySelector('.ip-text').textContent,'Click to get a Hint');
-  assert.equal(coach.querySelector('.ip-head button'),null);
-  assert.equal(coach.querySelectorAll('.ip-hint-btn').length,1);
-  coach.querySelector('.ip-text button').click();
+  assert.equal(a.state.practice.coachLine,'Find a stronger move');
+  assert.equal(coach.querySelector('button'),null,'no hint button inside the insights panel');
+  const hint=doc.querySelector('#controls .practice-hint');
+  assert.ok(hint.nextElementSibling.classList.contains('exit-analysis'));
+  hint.click();
   assert.equal(a.state.practice.hinted,true);
   assert.equal(a.run('sqByName.e2').classList.contains('hint-from'),true);
   assert.equal(doc.querySelectorAll('.sq.hint-from').length,1);
-  assert.ok(doc.querySelector('.practice-coach .ip-text .ip-hint-btn.on'));
+  assert.ok(hint.classList.contains('on'));
   a.call('practiceAttempt','g1','f3');
-  assert.equal(doc.querySelectorAll('.practice-coach .ip-hint-btn').length,1);
+  assert.equal(doc.querySelector('.practice-coach .ip-text').textContent,'Find a stronger move');
   a.call('practiceAttempt','e2','e4');
-  assert.equal(doc.querySelector('.practice-coach .ip-hint-btn'),null);
+  assert.equal(hint.classList.contains('on'),false);
   a.call('practiceEnterSolve');
   assert.equal(a.state.practice.fails,0);
   assert.equal(a.state.practice.hinted,false);
-  assert.equal(doc.querySelector('.practice-coach .ip-hint-btn'),null);
   assert.equal(doc.querySelector('.sq.hint-from'),null);
+});
+
+test('Hint pressed during the roll or mistake replay lights the piece once it is the player\'s turn',t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const a=practice(t),doc=a.dom.window.document;
+  a.state.practice.solving=false;a.state.idx=0;a.call('renderControls');
+  a.call('practiceRoll',0,()=>a.call('practiceEnterSolve'));
+  const hint=doc.querySelector('#controls .practice-hint');
+  assert.equal(a.state.practice.demoing,true);
+  hint.click();
+  assert.equal(doc.querySelector('.sq.hint-from'),null);
+  assert.ok(hint.classList.contains('on'),'queued hint shows as pressed');
+  for(const ms of [650,760,780])t.mock.timers.tick(ms);
+  assert.equal(a.state.practice.solving,true);
+  assert.equal(a.run('sqByName.e2').classList.contains('hint-from'),true);
+  assert.equal(a.state.practice.hintQueued,false);
+});
+
+test('long practice rolls speed up and arrive within 3 seconds; short ones keep the steady pace',t=>{
+  const a=app(t);
+  assert.deepEqual([...a.call('practiceRollTimes',10)],Array.from({length:11},(_,k)=>k*95));
+  for(const n of [40,120,300]){
+    const times=[...a.call('practiceRollTimes',n)],gaps=times.slice(1).map((v,k)=>v-times[k]);
+    assert.equal(times.length,n+1);
+    assert.ok(240+times[n]<=3000+1e-6,`${n} plies take ${240+times[n]} ms`);
+    assert.ok(240+times[n]>2900,'the budget is used, not undershot');
+    assert.equal(gaps[0],95,'starts at the normal pace');
+    for(let k=1;k<gaps.length;k++)assert.ok(gaps[k]<=gaps[k-1]+1e-9,'never slows down');
+  }
+});
+
+test('a long roll reaches the first mistake within 3 seconds and still lands on it',t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const a=app(t);
+  const moves=[];for(let i=0;i<30;i++)moves.push(i%4<2?['Nf3','Nf6'][i%2]:['Ng1','Ng8'][i%2]);
+  let pgn='';moves.forEach((m,i)=>{if(i%2===0)pgn+=`${i/2+1}. `;pgn+=m+' ';});
+  loadGame(a,pgn.trim());a.call('buildUI');a.call('renderAll');
+  a.state.idx=a.state.total;a.state.practice={spots:[1],i:0,solving:false,busy:false};
+  let arrived=null,elapsed=0;
+  a.call('practiceRoll',0,()=>{arrived=elapsed;});
+  while(arrived===null&&elapsed<5000){t.mock.timers.tick(1);elapsed+=1;}
+  assert.equal(a.state.idx,0);
+  assert.ok(arrived!==null&&arrived<=3000+16,`arrived after ${arrived} ms`);
+  assert.ok(arrived>2500,'a 30-ply roll still uses most of the budget, not a jump cut');
 });
 
 test('an alternative checkmate is rejected unless it is the stored answer',t=>{

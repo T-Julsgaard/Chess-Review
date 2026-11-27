@@ -4000,10 +4000,13 @@ function renderControls() {
     refs = UI.controlRefs = { mode };
     if (mode === "practice") {
       refs.position = el("span", { class: "pos practice-pos" });
-      refs.status = el("span", { class: "practice-status" });
-      UI.controls.replaceChildren(refs.position, refs.status,
+      // Hint is always available: pressed while the board is still rolling or replaying the
+      // mistake, it lights up the piece as soon as it's the player's turn.
+      refs.hint = el("button", { class: "practice-hint", title: "Highlight the piece to move", onclick: showPracticeHint }, "Hint");
+      UI.controls.replaceChildren(refs.position, refs.hint,
         el("button", { class: "exit-analysis", title: "Exit practice (Esc)", onclick: exitPractice }, el("span", { class: "ea-x" }, "✕"), "Exit"));
     } else {
+      delete UI.controls.dataset.practice;
       const variation = mode === "variation";
       refs.first = el("button", { "aria-label": variation ? "Variation start" : "Start",
         onclick: variation ? () => gotoVar(0) : () => go(0) }, icon("first"));
@@ -4021,13 +4024,12 @@ function renderControls() {
   if (S.practice) {
     const p = S.practice;
     const cur = Math.min(p.i + 1, p.spots.length);
-    const status = p.rolling ? "Rolling to your misstep…"
-      : p.demoing ? "Replaying your move…"
-      : p.busy ? "Checking…"
-      : p.solving ? "Find a stronger move" : "✓ Correct!";
     const position = `Practice ${cur}/${p.spots.length}`;
     if (refs.position.textContent !== position) refs.position.textContent = position;
-    if (refs.status.textContent !== status) refs.status.textContent = status;
+    refs.hint.classList.toggle("on", !!(S.practiceHint || p.hintQueued));
+    // Machine-readable phase for tests and screen captures (the bar no longer spells it out).
+    const phase = p.rolling ? "rolling" : p.demoing ? "demoing" : p.solving ? "solving" : "solved";
+    if (UI.controls.dataset.practice !== phase) UI.controls.dataset.practice = phase;
     return;
   }
   if (S.analysisMode && S.variation) {
@@ -4975,7 +4977,7 @@ function renderMoveComment() {
   }
   return body;
 }
-// Practice coaching: what to do, with an inline Hint button after the first failed try.
+// Practice coaching: what to do at each step of the practice run.
 function renderPracticeCoach() {
   const p = S.practice;
   const body = el("div", { class: "ip-body practice-coach" });
@@ -4999,13 +5001,9 @@ function renderPracticeCoach() {
            : (cl("correct_continue", {}) || "✓ Correct! Moving on…")));
     return body;
   }
-  if (p.solving && (p.fails >= 1 || p.hinted)) {
-    body.append(el("div", { class: "ip-text" }, "Click to get a ",
-      el("button", { class: "ip-hint-btn ip-hint-inline" + (S.practiceHint ? " on" : ""), title: "Highlight the piece to move", onclick: showPracticeHint }, "Hint")));
-    return body;
-  }
   // Demo replay OR solving — the SAME message, picked + typed once when we land on the spot so the
-  // demo and the solve phase don't show two different lines back to back.
+  // demo and the solve phase don't show two different lines back to back. (The Hint button lives
+  // in the controls bar, beside Exit.)
   const spot = p.spots[p.i];
   const badSan = S.positions[spot].san || "your move";
   const badCls = S.classif[spot];
@@ -5015,7 +5013,7 @@ function renderPracticeCoach() {
     // After a hint has been surfaced, switch to the coach's after-hint line if it has one.
     p.coachLine = (p.hinted && cl("after_hint", tok))
       || cl("prompt_find_better", tok)
-      || `${badSan} is ${/^[aeiou]/i.test(label) ? "an" : "a"} ${label}.`;
+      || "Find a stronger move";
   }
   const txt = el("div", { class: "ip-text" });
   body.append(txt);
@@ -8189,23 +8187,56 @@ function markCurrentSolved() {
   const id = currentGameId();
   return updateLibrary(library => library.map(rec => rec.id === id ? { ...rec, solved: true } : rec));
 }
+// Replay roll timing. Short rolls tick at a steady ROLL_STEP; longer ones start at that pace and
+// speed up gradually so the whole roll (lead-in included) never takes more than ~3 seconds.
+const ROLL_LEAD = 240, ROLL_STEP = 95, ROLL_TOTAL = 3000, ROLL_MIN_TICK = 16, ROLL_SOUND_GAP = 60;
+// times[k] = ms after the first ply lands at which the (k+1)-th ply lands; times[n] = arrival.
+function practiceRollTimes(n) {
+  const budget = ROLL_TOTAL - ROLL_LEAD;
+  let r = 1;
+  if (n * ROLL_STEP > budget) {
+    // Geometric speed-up: ROLL_STEP · (1 − rⁿ) / (1 − r) = budget, solved for r in (0, 1).
+    let lo = 0, hi = 1;
+    for (let i = 0; i < 50; i++) {
+      const mid = (lo + hi) / 2;
+      if (ROLL_STEP * (1 - mid ** n) / (1 - mid) > budget) hi = mid; else lo = mid;
+    }
+    r = lo;
+  }
+  const times = [0];
+  for (let k = 0, d = ROLL_STEP; k < n; k++, d *= r) times.push(times[k] + d);
+  return times;
+}
 // Replay roll: step from the CURRENT position to `target`, forward or backward, playing the
 // move tick each step (lightweight renders only, so it stays snappy). Calls done() on arrival.
+// When the steps get faster than a frame, several plies land per tick so the timing still holds.
 function practiceRoll(target, done) {
   const p = S.practice; if (!p) return;
   p.solving = false; p.rolling = true;
   target = Math.max(0, Math.min(S.total, target));
   paintBoard(); renderEvalBar(); renderMoves(); renderGraph(); renderControls(); renderReview();
-  const step = () => {
-    if (!S.practice) return;
-    if (S.idx === target) { S.practice.rolling = false; done(); return; }
-    S.idx += S.idx < target ? 1 : -1;
-    paintBoard(); renderEvalBar(); renderMoves(); renderGraph();
-    playMoveSound(S.idx);
-    S.practice.rollT = setTimeout(step, 95);
+  if (S.idx === target) { p.rolling = false; done(); return; }
+  const from = S.idx, dir = target > from ? 1 : -1, n = Math.abs(target - from);
+  const times = practiceRollTimes(n);
+  // Virtual clock (what we asked the timers for) or real time, whichever is further along: a late
+  // timer then skips ahead instead of stretching the roll.
+  let clock = 0, startedAt = 0, lastSound = -Infinity;
+  const tick = () => {
+    if (S.practice !== p) return;
+    const elapsed = Math.max(clock, performance.now() - startedAt);
+    let landed = 0;
+    while (landed <= n && times[landed] <= elapsed) landed++;
+    const idx = from + dir * Math.min(landed, n);
+    if (S.idx !== idx) {
+      S.idx = idx;
+      paintBoard(); renderEvalBar(); renderMoves(); renderGraph();
+      if (elapsed - lastSound >= ROLL_SOUND_GAP) { playMoveSound(S.idx); lastSound = elapsed; }
+    }
+    if (landed > n) { p.rolling = false; done(); return; }
+    clock = Math.max(elapsed + ROLL_MIN_TICK, times[landed]);
+    p.rollT = setTimeout(tick, clock - elapsed);
   };
-  if (S.idx === target) { p.rolling = false; done(); }
-  else p.rollT = setTimeout(step, 240);
+  p.rollT = setTimeout(() => { startedAt = performance.now(); tick(); }, ROLL_LEAD);
 }
 // We've rolled to the position right before the mistake. Reset per-spot state and replay the
 // actual wrong move (so the player remembers what they did) before handing control over.
@@ -8256,6 +8287,7 @@ function practiceBeginSolve(solvePos) {
   S.selectedSq = null; S.practiceHint = null;
   paintBoard(); renderEvalBar(); renderPlayers(); renderMoves(); renderGraph();
   renderControls(); renderReview(); renderEngineCurrent();
+  if (p.hintQueued) { p.hintQueued = false; showPracticeHint(); }   // Hint pressed before it was our turn
 }
 function practiceAdvance() {
   if (learningWorkspace || profileOwnsBoard()) { deferredPracticeAdvance = true; return; }
@@ -8301,15 +8333,19 @@ function buzzBoard() {
 }
 // Reveal the answer for the current practice spot: light up the engine's best move (the piece
 // it starts from + its target square) with the analytical highlight.
+// Pressed while the board is still rolling, replaying the mistake or celebrating a solve, the
+// hint is queued and shown the moment the (next) position is the player's to solve.
 function showPracticeHint() {
-  const p = S.practice; if (!p || !p.solving) return;
+  const p = S.practice; if (!p) return;
+  if (!p.solving) { p.hintQueued = true; renderControls(); return; }
   const solvePos = p.spots[p.i] - 1;
   const best = S.bests[solvePos];
   const uci = best && best.bestmove;
   if (!uci) { toast("No hint available for this position."); return; }
+  if (S.coach && !p.hinted) p.coachTyped = false;   // let the coach switch to its after-hint line
   p.hinted = true;
   S.practiceHint = { from: uci.slice(0, 2), to: uci.slice(2, 4) };
-  paintBoard(); renderReview();
+  paintBoard(); renderControls(); renderReview();
 }
 // Paint the practice hint (called from paintBoard so it survives re-renders). The hint just
 // lights up the square of the PIECE to move — same red highlight as a right-clicked square — and
