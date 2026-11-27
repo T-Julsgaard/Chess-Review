@@ -5199,16 +5199,12 @@ function updateQualityDistribution(root, sides) {
   });
 }
 function renderMoveQuality(sides, rows) {
-  const design = panelDesign('accuracyQuality', S.settings), distribution = design === 'distribution';
-  if (!distribution) return el('div', {class: 'acc-quality quality-original', 'data-quality-design': design},
-    originalQualityBreakdown(sides, rows, S.originalAccuracyExpanded, () => {
-      S.originalAccuracyExpanded = !S.originalAccuracyExpanded;
-      statsRefs = null; renderStats();
-      UI.stats.querySelector('.qbreak-toggle')?.focus({preventScroll: true});
-    }));
+  // Move quality has one design, the category distribution. (The Original overview
+  // keeps Old's compact breakdown on its single page.)
+  const design = panelDesign('accuracyQuality', S.settings);
   const modern = ['phases-modern', 'phases-modern-v2'].includes(panelDesign('accuracy', S.settings));
-  const content = el('div', {class: 'acc-quality' + (distribution ? ' quality-distribution' : ''), 'data-quality-design': design},
-    distribution && !modern ? el('div', {class: 'quality-summary'},
+  const content = el('div', {class: 'acc-quality quality-distribution', 'data-quality-design': design},
+    !modern ? el('div', {class: 'quality-summary'},
       el('div', {class: 'quality-totals'},
         el('strong', {'data-quality-total': sides[0]}),
         el('span', {}, S.analyzing && !S.blank ? 'Classified so far' : 'Moves classified'),
@@ -5224,13 +5220,13 @@ function renderMoveQuality(sides, rows) {
           onclick: event => { if (event.detail) event.currentTarget.blur(); jumpToCategory(side, k); }}, count);
       });
       rows[k] = counts;
-      return el('div', {class: 'qbreak-row', style: distribution ? {'--quality-color': QUALITY[k].color} : {}},
+      return el('div', {class: 'qbreak-row', style: {'--quality-color': QUALITY[k].color}},
         counts[0], categoryLabel(k), counts[1]);
     })));
-  if (distribution) updateQualityDistribution(content, sides);
+  updateQualityDistribution(content, sides);
   return content;
 }
-// Share Old's compact breakdown and category order with the Original page option.
+// Old's compact breakdown and category order, used by the Original overview.
 function originalQualityBreakdown(sides, rows, expanded, onToggle) {
   const keys = expanded ? QBREAK_FULL : QBREAK_SUMMARY;
   return el('div', {class: 'qbreak'}, ...keys.map(k => {

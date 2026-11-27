@@ -44,7 +44,7 @@ test('Visual offers Modern, Old and Custom and selecting a setup preserves the r
     assert.equal(a.state.settings.accent,'#5a8bef');assert.equal(a.state.settings.engineDepth,18);
     assert.equal(JSON.stringify({pgn:a.state.pgn,idx:a.state.idx,evals:a.state.evals,acc:a.state.acc,classif:a.state.classif}),before);
   }
-  for(const design of PANEL_DESIGNS)assert.equal(a.state.settings[design.setting],'original');
+  for(const design of PANEL_DESIGNS)assert.equal(a.state.settings[design.setting],design.panel==='accuracyQuality'?'distribution':'original');
 });
 
 test('Modern reproduces every supplied box and scale, including the collapsed Accuracy baseline',async t=>{
@@ -105,16 +105,15 @@ test('importing the setup layout keeps the preset and invalid files change nothi
   sameBoxes(a.store.layout,{board:supplied.layout.board,engine:supplied.layout.engine});
 });
 
-test('saved Modern adopts Category bars while an individually selected Original remains Custom',async t=>{
+test('a saved Original move quality choice becomes Category bars in every setup',async t=>{
   for(const setup of ['modern','custom']) {
     const a=app(t,{url:'https://extension.test/analysis.html?workspace=blank'});
     a.replace('resetSettingsForRelease',async()=>{});
     a.store.settings={...UI_SETUPS.modern.designs,uiSetup:setup,uiSetupBase:'modern',accuracyQualityDesign:'original'};
     await a.start();a.call('setAccuracyPage',1);
-    const expected=setup==='modern'?'distribution':'original';
     assert.equal(a.state.settings.uiSetup,setup);
-    assert.equal(a.state.settings.accuracyQualityDesign,expected);
-    assert.equal(a.dom.window.document.querySelector('.acc-quality').dataset.qualityDesign,expected);
+    assert.equal(a.state.settings.accuracyQualityDesign,'distribution');
+    assert.equal(a.dom.window.document.querySelector('.acc-quality').dataset.qualityDesign,'distribution');
     if(setup==='modern')assert.equal(a.store.settings.modernQualityVersion,1);
   }
 });

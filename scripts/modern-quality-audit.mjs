@@ -22,7 +22,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await run("import('./analysis.js').then(async m=>{await m.applyUiSetup('modern');m.S.settings.moveAnim=false;m.renderStats()})");
   const original = await run("import('./analysis.js').then(m=>JSON.stringify({acc:m.S.acc,stats:m.S.gameStats,idx:m.S.idx,counts:m.S.counts,layout:m.S.layout}))");
   const evidence = [];
-  for (const design of ['original','distribution']) {
+  for (const design of ['distribution']) {
     await run(`import('./analysis.js').then(m=>{m.S.settings.accuracyQualityDesign='${design}';m.renderStats()})`);
     for (const [width,height] of [[1920,1080],[1920,919],[1366,768],[1280,600],[1100,480],[820,900],[1366,657],[1280,590]]) {
       await resize(width,height);
@@ -97,5 +97,5 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   assert.equal(await run("!!document.querySelector('.category-name-input,.category-name-reset')"),false);
   assert.equal(await run("document.querySelector('[data-category=brilliant] .nm').textContent"),'Brilliant');
   await fs.writeFile(path.join(out,'modern-quality.json'),JSON.stringify(evidence,null,2));
-  console.log('Both Modern Quality designs passed eight viewports, exact overview headers, centered badge/text groups, no bars, badge-only enlargement, reduced motion and read-only categories. Screenshots: '+out);
+  console.log('Modern Quality passed eight viewports, exact overview headers, centered badge/text groups, no bars, badge-only enlargement, reduced motion and read-only categories. Screenshots: '+out);
 }

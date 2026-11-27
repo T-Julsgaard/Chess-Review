@@ -15,23 +15,25 @@ function review(t) {
   return a;
 }
 
-test('Original move quality reuses Old’s compact breakdown and expansion with live counts', async t => {
+test('Move quality has one design: Old and a saved Original choice show the distribution', async t => {
   const a = review(t), doc = a.dom.window.document;
   await a.call('applyUiSetup', 'old');
-  const original = doc.querySelector('.qbreak').innerHTML;
+  assert.equal(a.store.settings.accuracyQualityDesign, 'distribution');
+  assert.equal(doc.querySelectorAll('.qbreak-row').length, 7, 'Old’s Original overview keeps its compact breakdown');
   await a.call('setSetting', 'accuracyDesign', 'phases-modern');
   a.call('setAccuracyPage', 1);
-  assert.equal(doc.querySelector('.quality-original .qbreak').innerHTML, original);
-  assert.equal(doc.querySelectorAll('.qbreak-row').length, 7);
-  doc.querySelector('.qbreak-toggle').click();
-  assert.equal(doc.querySelectorAll('.qbreak-row').length, 10);
-  assert.equal(doc.querySelector('.qbreak-toggle').getAttribute('aria-expanded'), 'true');
-  a.state.analyzing = true; a.call('renderStats');
-  const counter = doc.querySelector('[data-category="good"]').closest('.qbreak-row').querySelector('.ct.left');
-  a.state.counts.b.good = 3; a.call('renderStats');
-  assert.equal(counter.textContent, '3'); assert.equal(counter.disabled, false);
-  doc.querySelector('.qbreak-toggle').click();
-  assert.equal(doc.querySelectorAll('.qbreak-row').length, 7);
+  assert.equal(doc.querySelector('.acc-quality').dataset.qualityDesign, 'distribution');
+  assert.equal(doc.querySelectorAll('.quality-distribution .qbreak-row').length, 10);
+  assert.equal(doc.querySelector('.qbreak-toggle'), null);
+  await a.call('setSetting', 'accuracyQualityDesign', 'original');
+  assert.equal(a.store.settings.accuracyQualityDesign, 'distribution');
+  const restored = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  restored.replace('resetSettingsForRelease', async () => {});
+  restored.store.settings = {accuracyDesign: 'phases-modern', accuracyQualityDesign: 'original'};
+  await restored.start(); restored.call('setAccuracyPage', 1);
+  assert.equal(restored.state.settings.accuracyQualityDesign, 'distribution');
+  assert.equal(restored.store.settings.accuracyQualityDesign, 'distribution');
+  assert.ok(restored.dom.window.document.querySelector('.quality-distribution'));
 });
 
 test('distribution uses each player’s classified total and preserves category navigation', t => {
@@ -67,24 +69,17 @@ test('page design choices save independently, restore on startup and reset with 
   const a = review(t), doc = a.dom.window.document;
   const before = JSON.stringify({acc: a.state.acc, classif: a.state.classif, idx: a.state.idx, layout: a.state.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Visual changes must not reanalyze'); });
-  await a.call('setSetting', 'accuracyQualityDesign', 'original');
-  assert.equal(doc.querySelector('.quality-summary'), null);
-  assert.equal(doc.querySelectorAll('.qbreak-row').length, 7);
-  doc.querySelector('.qbreak-toggle').click();
-  assert.equal(doc.querySelectorAll('.qbreak-row').length, 10);
   assert.equal(a.state.settings.accuracyDesign, 'phases');
   await a.call('setSetting', 'accuracyDesign', 'pages');
-  assert.equal(doc.querySelector('.acc-quality').dataset.qualityDesign, 'original');
-  await a.call('setSetting', 'accuracyQualityDesign', 'distribution');
+  assert.equal(doc.querySelector('.acc-quality').dataset.qualityDesign, 'distribution');
   assert.ok(doc.querySelector('.quality-summary'));
   assert.equal(a.store.settings.accuracyDesign, 'pages');
-  assert.equal(a.store.settings.accuracyQualityDesign, 'distribution');
   assert.equal(JSON.stringify({acc: a.state.acc, classif: a.state.classif, idx: a.state.idx, layout: a.state.layout}), before);
   const restored = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
   restored.replace('resetSettingsForRelease', async () => {});
-  restored.store.settings = {accuracyDesign: 'phases', accuracyQualityDesign: 'original', accuracyAdvancedDesign: 'original'};
+  restored.store.settings = {accuracyDesign: 'phases', accuracyQualityDesign: 'distribution', accuracyAdvancedDesign: 'original'};
   await restored.start(); restored.call('setAccuracyPage', 1);
-  assert.equal(restored.dom.window.document.querySelector('.acc-quality').dataset.qualityDesign, 'original');
+  assert.equal(restored.dom.window.document.querySelector('.acc-quality').dataset.qualityDesign, 'distribution');
   await restored.call('resetVisualSettings');
   assert.equal(restored.store.settings.accuracyQualityDesign, 'distribution');
   assert.equal(restored.store.settings.accuracyAdvancedDesign, 'original');
@@ -121,8 +116,8 @@ test('repeated category count clicks cycle through each player’s moves and wra
   const a = review(t), S = a.state, doc = a.dom.window.document;
   S.classif = [null, 'best', 'blunder', 'blunder', 'best', 'blunder', 'blunder'];
   S.counts.b.blunder = 2; S.counts.w.blunder = 2;
-  for (const design of ['original', 'distribution']) {
-    S.settings.accuracyQualityDesign = design; a.call('renderStats');
+  {
+    a.call('renderStats');
     const row = doc.querySelector('.qbreak-row [data-category="blunder"]').closest('.qbreak-row');
     for (const [selector, plies] of [['.ct.left', [2, 6, 2]], ['.ct:not(.left)', [3, 5, 3]]]) {
       a.call('go', 0);

@@ -54,18 +54,11 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await call('Input.dispatchKeyEvent', {type:'keyDown', key:'Enter', code:'Enter', text:'\r', unmodifiedText:'\r', windowsVirtualKeyCode:13, nativeVirtualKeyCode:13}, review.sessionId);
   await call('Input.dispatchKeyEvent', {type:'keyUp', key:'Enter', code:'Enter', windowsVirtualKeyCode:13, nativeVirtualKeyCode:13}, review.sessionId);
   await waitFor(review, `import('./analysis.js').then(m=>m.S.idx===${jump})`, 'Keyboard category jump');
-  // Verify the two independent saved selections through the real settings controls.
+  // Move quality has a single design, so Settings offers no choice for it.
   await run("document.querySelector('[aria-label=Settings]').click()");
   await run("[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Tabs').click()");
-  for (const label of ['Accuracy overview', 'Accuracy move quality', 'Accuracy advanced']) {
-    assert.equal(await run(`[...document.querySelectorAll('.set-lbl')].some(n=>n.textContent===${JSON.stringify(label)})`), true);
-  }
-  await run("document.querySelector('[data-setting=accuracyQualityDesign][data-value=original]').click()");
-  await waitFor(review, "!document.querySelector('.quality-summary')", 'Original move quality');
-  assert.equal(await run("import('./analysis.js').then(m=>m.S.settings.accuracyDesign)"), 'phases');
-  await run("document.querySelector('[aria-label=Settings]').click()"); await shot('move-quality-original');
-  await run("document.querySelector('[aria-label=Settings]').click();document.querySelector('[data-setting=accuracyQualityDesign][data-value=distribution]').click()");
-  await waitFor(review, "!!document.querySelector('.quality-summary')", 'Distribution move quality');
+  assert.equal(await run("[...document.querySelectorAll('.set-lbl')].some(n=>n.textContent==='Accuracy overview')"), true);
+  assert.equal(await run("[...document.querySelectorAll('.set-lbl')].some(n=>n.textContent==='Accuracy move quality')"), false);
   await run("document.querySelector('[aria-label=Settings]').click()");
   await call('Page.reload', {}, review.sessionId);
   await waitFor(review, "import('./analysis.js').then(m=>!m.S.analyzing&&!!document.querySelector('#accuracy-tab-1'))", 'Reload');
