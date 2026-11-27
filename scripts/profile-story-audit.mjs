@@ -18,7 +18,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   if (settingsOnly) return auditSettings({review, call, run, sleep, out});
   if (motionOnly) {
     await call('Page.bringToFront', {}, review.sessionId);
-    return auditPanelMotion({run, sleep, waitFor: expression => waitFor(review, expression, 'Panel motion')});
+    await auditPanelMotion({run, sleep, waitFor: expression => waitFor(review, expression, 'Panel motion')});
+    return auditTypewriter(run);
   }
   // Panel width follows the user's saved review layout, independently of the
   // viewport. Keep mode switches usable beside long titles in narrow panels.
@@ -156,6 +157,53 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await run('w.close()');
   await fs.writeFile(path.join(out, 'profile-story-evidence.json'), JSON.stringify(evidence, null, 2));
   console.log(JSON.stringify({ok: true, out, viewports: evidence.length}));
+}
+
+/** Balanced wrapping must stay identical at every key, including while erasing. */
+export async function auditTypewriter(run) {
+  const results = await run(`(async () => {
+    const {createTypewriter} = await import('./lib/profile/mini-me.js');
+    const {ProfileWorkspace} = await import('./lib/profile/workspace.js');
+    const lines = ProfileWorkspace.prototype.devNoteLines();
+    const results = [];
+    for (const width of [280, 360, 430, 480, 600]) {
+      let next;
+      const win = {setTimeout: fn => { next = fn; return 1; }};
+      const note = createTypewriter({doc: document, win, lines});
+      Object.assign(note.element.style, {position: 'fixed', top: '0', left: '0', width: width + 'px'});
+      document.body.append(note.element);
+      note.start();
+      await document.fonts.ready;
+      let paragraph, positions, height, frames = 0, shifts = 0, brokenWords = 0;
+      const sample = () => {
+        const text = note.element.querySelector('.profile-type-text').textContent;
+        const current = [...note.element.querySelectorAll('.profile-type-char')].map(letter => {
+          const range = document.createRange(); range.selectNodeContents(letter);
+          const r = range.getBoundingClientRect(); return [r.x, r.y];
+        });
+        if (current.length !== Array.from(text).length) throw Error('Every letter must retain its own box');
+        const h = note.element.getBoundingClientRect().height;
+        if (text !== paragraph) {
+          paragraph = text; positions = current; height = h;
+          brokenWords += current.filter((p, i) => i > 0 && p[1] !== current[i - 1][1] && !/\\s/.test(text[i]) && !/\\s/.test(text[i - 1])).length;
+        } else if (Math.abs(h - height) > 1 || current.some((p, i) => Math.abs(p[0] - positions[i][0]) > 1 || Math.abs(p[1] - positions[i][1]) > 1)) shifts++;
+        frames++;
+      };
+      try {
+        sample();
+        while (next) { const fn = next; next = null; fn(); await Promise.resolve(); sample(); }
+        results.push({width, frames, shifts, brokenWords});
+      } finally { note.element.remove(); }
+    }
+    return results;
+  })()`);
+  for (const result of results) {
+    assert.ok(result.frames > 500, JSON.stringify(result));
+    assert.equal(result.shifts, 0, JSON.stringify(result));
+    assert.equal(result.brokenWords, 0, JSON.stringify(result));
+  }
+  console.log('Developer note: typing and erasing keep every letter fixed at all five panel widths.');
+  return results;
 }
 
 /** Real layout and WAAPI coverage for the playstyle panel's mode/sort transitions. */

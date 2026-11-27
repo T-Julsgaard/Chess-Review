@@ -43,11 +43,11 @@ test('typewriter: types a line in its final place, erases it, then types the nex
   window.document.body.append(note.element);
   assert.equal(note.element.querySelector('.profile-type-sr').textContent, lines.join(' '), 'screen readers get it all at once');
   assert.equal(note.element.querySelector('.profile-type-screen').getAttribute('aria-hidden'), 'true');
-  const typed = () => note.element.querySelector('.profile-type-typed').textContent;
-  const rest = () => note.element.querySelector('.profile-type-rest').textContent;
+  const typed = () => [...note.element.querySelectorAll('.profile-type-char.is-visible')].map(n => n.textContent).join('');
+  const rest = () => [...note.element.querySelectorAll('.profile-type-char:not(.is-visible)')].map(n => n.textContent).join('');
   const seen = [];
   const watch = new window.MutationObserver(() => seen.push(typed() + '|' + rest()));
-  watch.observe(note.element, {subtree: true, childList: true, characterData: true});
+  watch.observe(note.element, {subtree: true, childList: true, characterData: true, attributes: true});
   note.start();
   for (let i = 0; i < 400; i++) await new Promise(resolve => setTimeout(resolve, 0));
   assert.ok(seen.includes('Hi|.'), 'the untyped rest keeps its place');
@@ -62,6 +62,32 @@ test('mini-me: the wheel scrolls the panel as usual; he does not zoom', () => {
   const wheel = new window.WheelEvent('wheel', {deltaY: -100, bubbles: true, cancelable: true});
   mini.element.dispatchEvent(wheel);
   assert.ok(!wheel.defaultPrevented);
+});
+
+test('typewriter: long paragraphs keep the same letter boxes while typing and erasing', async () => {
+  const {window} = new JSDOM('<body></body>');
+  let next;
+  const win = {setTimeout: fn => { next = fn; return 1; }};
+  const line = "It's 100% free and open source, with no ads or marketing budget, so the only way it reaches new players is through word of mouth.";
+  const note = createTypewriter({doc: window.document, win, lines: [line, 'Thanks.']});
+  window.document.body.append(note.element);
+  note.start();
+  const text = note.element.querySelector('.profile-type-text');
+  const letters = [...text.children];
+  assert.equal(letters.length, line.length);
+  let frames = 0, fullyTyped = false, erased = false;
+  while (next) {
+    const fn = next; next = null; fn(); await Promise.resolve();
+    if (text.textContent !== line) break;
+    frames++;
+    assert.deepEqual([...text.children], letters, 'keys change visibility without replacing inline boxes');
+    assert.equal(text.querySelectorAll('.is-caret').length, 1);
+    const visible = text.querySelectorAll('.is-visible').length;
+    if (visible === letters.length) fullyTyped = true;
+    if (fullyTyped && visible === 0) erased = true;
+  }
+  assert.ok(frames >= line.length * 2 && fullyTyped && erased);
+  window.close();
 });
 
 test('typewriter: a line break in a line is kept on screen, and read as a space', () => {

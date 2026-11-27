@@ -172,14 +172,17 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-type-screen > * { grid-area: 1 / 1; white-space: pre-wrap; }
 .profile-type-measure { visibility: hidden; }
 .profile-type.is-still .profile-type-measure { display: none; }
-/* The untyped rest holds the line's final place without showing. */
-.profile-type-rest { visibility: hidden; }
-/* The block cursor takes no room of its own (a plain inline, so it adds no place to wrap), so the text never moves under it. */
-.profile-type-caret { position: relative; }
-.profile-type-caret::after { content: ""; position: absolute; left: 1px; top: 0; width: .58em; height: 1.15em; background: #bbbcb4; animation: profile-caret 1.05s steps(1) infinite; }
+/* Every letter keeps its inline box while typing and erasing, so balanced wrapping stays fixed. */
+.profile-type-char { position: relative; visibility: hidden; }
+.profile-type-char.is-visible { visibility: visible; }
+/* The cursor sits over the next letter and takes no space in the line. */
+/* Keep every cursor box present: inserting one only at the active letter also changes balanced wrapping. */
+.profile-type-char::after { content: ""; position: absolute; visibility: hidden; left: 1px; top: 0; width: .58em; height: 1.15em; background: #bbbcb4; }
+.profile-type-char.is-caret::after { visibility: visible; animation: profile-caret 1.05s steps(1) infinite; }
+.profile-type-char.is-caret-end::after { left: 100%; }
 /* That pale grey would vanish on a light panel: there the cursor takes the text's colour. */
-[data-theme="light"] .profile-type-caret::after { background: var(--ink-2); }
-.profile-type.is-typing .profile-type-caret::after { animation: none; }
+[data-theme="light"] .profile-type-char.is-caret::after { background: var(--ink-2); }
+.profile-type.is-typing .profile-type-char.is-caret::after { animation: none; }
 .profile-type-all { display: flex; flex-direction: column; gap: 6px; }
 @keyframes profile-caret { 50% { opacity: 0; } }
 .profile-type-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
