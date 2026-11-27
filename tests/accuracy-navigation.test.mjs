@@ -14,7 +14,7 @@ function navigation(t) {
     offsetLeft: {value: 4 + i * 80}, offsetWidth: {value: 80}, offsetHeight: {value: 30},
   }));
   surface.getBoundingClientRect = () => ({left: 100 + (painted.x + 1) * .5, width: painted.width * .5, height: painted.height * .5});
-  for (const layer of rail.querySelectorAll('.acc-nav-current,.acc-nav-wake')) layer.animate = (frames, options) => {
+  surface.animate = (frames, options) => {
     const animation = {frames, options, cancelled: false, cancel() {this.cancelled = true;}};
     animations.push(animation); return animation;
   };
@@ -26,16 +26,16 @@ function navigation(t) {
 test('liquid reversals continue from the painted shape in a scaled panel and cancel old animations', t => {
   const {a, rail, animations, paint} = navigation(t);
   a.call('setAccuracyPage', 2);
-  assert.equal(animations.length, 2);
+  assert.equal(animations.length, 1, 'one surface flows; nothing trails behind it');
+  assert.equal(rail.querySelector('.acc-nav-wake'), null);
   assert.equal(animations[0].frames[0].transform, 'translateX(4px) scale(1,1)');
   assert.equal(animations[0].frames.at(-1).transform, 'translateX(164px) scale(1,1)');
   assert.ok(animations[0].frames[12].transform.includes('scale('));
-  assert.ok(animations[1].options.duration > animations[0].options.duration);
   paint({x: 78, width: 120, height: 25});
   a.call('setAccuracyPage', 0);
-  assert.equal(animations[0].cancelled, true); assert.equal(animations[1].cancelled, true);
-  assert.equal(animations[2].frames[0].transform, 'translateX(78px) scale(1.5,0.8333333333333334)');
-  assert.equal(animations[2].frames.at(-1).transform, 'translateX(4px) scale(1,1)');
+  assert.equal(animations[0].cancelled, true);
+  assert.equal(animations[1].frames[0].transform, 'translateX(78px) scale(1.5,0.8333333333333334)');
+  assert.equal(animations[1].frames.at(-1).transform, 'translateX(4px) scale(1,1)');
   assert.equal(rail.querySelectorAll('[aria-selected="true"]').length, 1);
   const count = animations.length;
   a.call('renderStats'); assert.equal(animations.length, count, 'Result updates do not restart the flow');
@@ -45,11 +45,11 @@ test('disabled and reduced motion settle selection immediately and cancel any pr
   const {a, surface, animations} = navigation(t);
   a.call('setAccuracyPage', 2);
   a.state.settings.uiAnim = false; a.call('setAccuracyPage', 1);
-  assert.equal(animations.length, 2); assert.ok(animations.every(item => item.cancelled));
+  assert.equal(animations.length, 1); assert.ok(animations.every(item => item.cancelled));
   assert.equal(surface.style.transform, 'translateX(84px) scale(1,1)');
   a.state.settings.uiAnim = true; a.dom.window.matchMedia = () => ({matches: true});
   a.call('setAccuracyPage', 0);
-  assert.equal(animations.length, 2);
+  assert.equal(animations.length, 1);
   assert.equal(surface.style.transform, 'translateX(4px) scale(1,1)');
 });
 

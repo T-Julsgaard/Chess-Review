@@ -1580,7 +1580,7 @@ button { font-family: inherit; cursor: pointer; }
 .acc-phase-track { display: block; height: 3px; border-radius: 4px; overflow: hidden; background: var(--panel-3); }
 .acc-phase-track i { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
 .acc-phase-track:last-child i { margin-left: auto; background: var(--ink-2); opacity: .7; }
-/* A quiet liquid surface: one selected destination, one passing wake. */
+/* A quiet liquid surface: one selected destination that flows between tabs. */
 .acc-navigation { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(3,minmax(0,1fr));
   flex: none; gap: 0; margin: 4px 8px 0; padding: 4px; min-height: 36px; border: 1px solid var(--line-soft);
   border-radius: 13px; background: color-mix(in srgb,var(--panel-2) 72%,var(--panel)); }
@@ -1591,12 +1591,10 @@ button { font-family: inherit; cursor: pointer; }
 .acc-navigation button[aria-selected="true"] { color: var(--accent); }
 .acc-navigation:not([data-ready="true"]) button[aria-selected="true"] { background: color-mix(in srgb,var(--accent) 14%,var(--panel)); }
 .acc-navigation button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.acc-nav-current,.acc-nav-wake { position: absolute; z-index: 0; pointer-events: none; top: 4px; bottom: 4px; left: 0;
-  border-radius: 10px; transform-origin: left center; visibility: hidden; }
+.acc-nav-current { position: absolute; z-index: 0; pointer-events: none; top: 4px; bottom: 4px; left: 0;
+  border-radius: 10px; transform-origin: left center; visibility: hidden; background: color-mix(in srgb,var(--accent) 14%,var(--panel)); }
 /* Follow the review panel's visibility when learning mode hides it. */
-.acc-navigation[data-ready="true"] :is(.acc-nav-current,.acc-nav-wake) { visibility: inherit; }
-.acc-nav-current { background: color-mix(in srgb,var(--accent) 14%,var(--panel)); }
-.acc-nav-wake { background: var(--accent); opacity: 0; }
+.acc-navigation[data-ready="true"] .acc-nav-current { visibility: inherit; }
 @media (prefers-reduced-motion: reduce) { .acc-navigation button { transition: none; } }
 .acc-comparison { text-align: center; padding: 10px 0 12px; border-bottom: 1px solid var(--line-soft); }
 .acc-metric-label { font-size: 14px; font-weight: 600; color: var(--ink-2); margin-bottom: 9px; }
