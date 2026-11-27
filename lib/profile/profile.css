@@ -306,7 +306,11 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
   .profile-setup-card [aria-label="Period"] { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 /* One username box, or Chess.com and Lichess side by side in one row. */
-.profile-account-fields { display: grid; grid-template-columns: minmax(0, 1fr); }
+.profile-account-fields { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); }
+/* A box opening or folding shut as the site changes: clipped to its width, one line tall. */
+.profile-account-field:is(.is-growing, .is-leaving) { overflow: hidden; }
+.profile-account-field:is(.is-growing, .is-leaving) .profile-setup-error { white-space: nowrap; }
+.profile-account-field.is-leaving { position: absolute; pointer-events: none; }
 .profile-account-fields[data-both] { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 14px; }
 .profile-account-field .profile-field-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .profile-input-wrap { position: relative; display: flex; min-width: 0; }
