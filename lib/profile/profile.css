@@ -272,7 +272,7 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-setup-mark svg { display: block; width: 28px; height: 28px; }
 /* A lifted surface: lit along its top edge, a faint green glow in the corner the eye starts
    from, and a soft layered shadow underneath. The tracks and fields inside sit lower than it. */
-.profile-setup-card { position: relative; display: flex; flex-direction: column; gap: 22px; padding: 26px; min-width: 0;
+.profile-setup-card { --setup-gap: 22px; position: relative; display: flex; flex-direction: column; gap: var(--setup-gap); padding: 26px; min-width: 0;
   border: 1px solid color-mix(in oklab, var(--line) 85%, var(--ink) 5%); border-radius: 18px;
   background: radial-gradient(120% 70% at 0% 0%, color-mix(in oklab, var(--accent) 8%, transparent), transparent 60%),
     linear-gradient(180deg, color-mix(in oklab, var(--panel-3) 65%, var(--panel-2)), var(--panel) 85%);
@@ -291,12 +291,12 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-setup-card .profile-build { width: 100%; justify-content: center; min-height: 48px; }
 .profile-stacked .profile-slide-host:has(> .profile-setup) { padding: 18px 12px; }
 .profile-stacked .profile-setup { gap: 20px; }
-.profile-stacked .profile-setup-card { gap: 18px; padding: 18px 14px; border-radius: 14px; }
+.profile-stacked .profile-setup-card { --setup-gap: 18px; padding: 18px 14px; border-radius: 14px; }
 @container profile-setup (max-height: 620px) {
   .profile-setup { gap: 20px; }
   .profile-setup-mark { width: 32px; height: 32px; margin-bottom: 2px; }
   .profile-setup-mark svg { width: 23px; height: 23px; }
-  .profile-setup-card { gap: 18px; padding: 20px; }
+  .profile-setup-card { --setup-gap: 18px; padding: 20px; }
 }
 @container profile-setup (max-height: 400px) {
   .profile-setup { gap: 18px; }
@@ -348,7 +348,16 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-setup .profile-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent); }
 .profile-setup .profile-input.invalid { border-color: var(--q-blunder); box-shadow: 0 0 0 3px color-mix(in oklab, var(--q-blunder) 18%, transparent); }
 .profile-setup-error { margin: -6px 0 0; font-size: 12.5px; color: var(--q-blunder); }
-.profile-account-field .profile-setup-error { margin-top: -2px; overflow-wrap: anywhere; }
+/* The red lines take no room of their own: each sits in the gap the card already leaves, centred in
+   it, so nothing in the setup moves when one shows. One line, cut short only past the row's width. */
+.profile-setup-card .profile-setup-error { --error-line: 14px; margin: 0; line-height: var(--error-line); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Under a username: below the whole row, so a long message can run under the other box. Lichess's
+   box is on the right when both show, so its message keeps to the right edge. */
+.profile-account-field .profile-setup-error { position: absolute; left: 0; right: 0; top: calc(100% + (var(--setup-gap) - var(--error-line)) / 2); }
+.profile-account-fields[data-both] > [data-site="lichess"] .profile-setup-error { text-align: right; }
+/* The dates' message, in the gap above Build profile: no height, and its own gap taken back. */
+.profile-setup-card > .profile-setup-error { position: relative; height: 0; min-height: 0; overflow: visible; margin-top: calc(-1 * var(--setup-gap));
+  top: calc((var(--setup-gap) - var(--error-line)) / 2); }
 .profile-setup-actions { display: flex; gap: 10px; align-items: center; }
 .profile-build { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 10px 20px; font-size: 14px; border-radius: 11px; }
 .profile-button-arrow { display: inline-block; transition: transform .2s cubic-bezier(.16,1,.3,1); }
