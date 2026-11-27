@@ -279,7 +279,7 @@ try {
   }
   // Simulate upgrading a 0.3.0 user to 0.4.0 against real browser storage and render the
   // resulting defaults. Existing engine tests above also populate saved games.
-  await browserAPI.storage.local.remove(['settingsResetFor040','introTour:seen','learningAnnouncement:puzzles:seen','learningAnnouncement:puzzles:disabled']);
+  await browserAPI.storage.local.remove(['settingsResetFor040','introTour:seen','introTour:explanationsPending','learningAnnouncement:puzzles:seen','learningAnnouncement:puzzles:disabled']);
   localStorage.removeItem('introTour:seen');localStorage.removeItem('learningAnnouncement:puzzles:seen');localStorage.removeItem('learningAnnouncement:puzzles:disabled');
   const resetJob={pgn:'1. e4 e5 *',meta:{gameId:'reset-smoke'},source:'pgn'};
   const library=(await browserAPI.storage.local.get('library')).library;

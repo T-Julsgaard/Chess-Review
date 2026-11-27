@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { UI_SETUPS, MODERN_LAYOUT } from '../lib/ui-setups.js';
-import { INTRO_TOUR_SEEN as seen } from '../lib/learning-announcement.js';
+import { INTRO_TOUR_SEEN as seen, INTRO_EXPLANATIONS_PENDING as pending } from '../lib/learning-announcement.js';
 const legacy = ['learningAnnouncement:puzzles:seen', 'learningAnnouncement:puzzles:disabled'];
 
 let installed;
@@ -200,12 +200,21 @@ for (const updating of [false, true]) test(`${updating ? 'updating' : 'new'} use
   assert.equal(store.settings.coachEngineReplies, false);
   next(); await settle();
   assert.equal(a.state.settings.coachEngineReplies, false);
-  next(); await a.run('_settingsWriteQueue'); await settle();
+  // The toolbar icon opens an empty workspace: there is no switch to show yet.
+  next(); await settle();
+  assert.equal(doc.querySelector('.learning-announcement'), null, 'The tour pauses after Learn without a game');
+  assert.equal(store[pending], true);
+  assert.equal(a.state.settings.coachEngineReplies, false);
+  await a.call('applyGame', {pgn: '1. e4 e5 2. Nf3 Nc6', meta: {}, analysis: null});
+  await new Promise(resolve => a.dom.window.setTimeout(resolve, 150));
+  await a.run('_settingsWriteQueue'); await settle();
   assert.equal(doc.querySelector('.learning-announcement h2').textContent, 'Engine explanations');
+  assert.ok(doc.querySelector('.ip-explanations-toggle.learning-announcement-target'), 'The first game points to the switch');
   assert.equal(store.settings.coachEngineReplies, true);
-  assert.ok(doc.querySelector('.insight-panel.learning-announcement-target'), 'An empty workspace points to Insights');
+  assert.equal(store[pending], false);
   next();
   assert.equal(doc.querySelector('.learning-announcement'), null);
+  a.run('learningAnnouncement?.dispose()');
   const reopened = await workspace(t);
   assert.equal(reopened.state.settings.coachEngineReplies, true);
   assert.equal(reopened.dom.window.document.querySelector('.learning-announcement'), null);

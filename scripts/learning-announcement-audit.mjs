@@ -8,7 +8,7 @@ const STEPS = [
   {target: 'learn', title: 'Learn with Chess Review'},
   {target: 'engine-explanations', title: 'Engine explanations'},
 ];
-const KEYS = "['introTour:seen','learningAnnouncement:puzzles:seen','learningAnnouncement:puzzles:disabled']";
+const KEYS = "['introTour:seen','introTour:explanationsPending','learningAnnouncement:puzzles:seen','learningAnnouncement:puzzles:disabled']";
 
 export async function auditLearning({review, call, evaluate, waitFor, sleep, out}) {
   const run = expression => evaluate(review, expression);

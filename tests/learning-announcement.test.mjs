@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
 import {claimLearningAnnouncement, mountLearningAnnouncement, INTRO_STEPS,
-  INTRO_TOUR_SEEN as seen} from '../lib/learning-announcement.js';
+  INTRO_TOUR_SEEN as seen, INTRO_EXPLANATIONS_PENDING as pending} from '../lib/learning-announcement.js';
 const legacy = ['learningAnnouncement:puzzles:seen', 'learningAnnouncement:puzzles:disabled'];
 import {app, loadGame, settle} from './helpers/app.mjs';
 
@@ -80,10 +80,13 @@ test('a hidden or closed page cannot claim while waiting for the origin lock', a
   assert.equal(await result, false); assert.equal(p.data[seen], undefined);
 });
 
-function setup(t, {hidden = false, motion = false} = {}) {
-  const dom = new JSDOM('<header class="topbar"></header><nav class="section-rail"><button class="section-btn" data-section="learn">Learn</button><button class="section-btn" data-section="playstyle">Playstyle</button></nav><div id="canvas"><button class="learn-entry-button">Solve Puzzles</button><div class="insight-panel"><button class="ip-explanations-toggle" data-section="explanations"></button></div></div>',
+function setup(t, {hidden = false, motion = false, game = true, shared} = {}) {
+  // Without a game, Insights holds the saved-games search and no explanations switch.
+  const toggle = '<button class="ip-explanations-toggle" data-section="explanations"></button>';
+  const dom = new JSDOM(`<header class="topbar"></header><nav class="section-rail"><button class="section-btn" data-section="learn">Learn</button><button class="section-btn" data-section="playstyle">Playstyle</button></nav><div id="canvas"><button class="learn-entry-button">Solve Puzzles</button><div class="insight-panel">${game ? toggle : '<form class="archive"></form>'}</div></div>`,
     {url: 'https://extension.test', pretendToBeVisual: true});
-  const p = persistence();
+  // Tabs of one browser profile share extension storage and the origin lock.
+  const p = shared || persistence();
   Object.defineProperty(dom.window.navigator, 'locks', {value: p.locks});
   let visibility = hidden ? 'hidden' : 'visible';
   Object.defineProperty(dom.window.document, 'visibilityState', {get: () => visibility});
@@ -95,6 +98,8 @@ function setup(t, {hidden = false, motion = false} = {}) {
   return {...p, dom, document, mount, settingsChanges,
     card: () => document.querySelector('.learning-announcement'),
     highlighted: () => [...document.querySelectorAll('.learning-announcement-target')].map(button => button.dataset.section),
+    loadGame() { document.querySelector('.insight-panel').innerHTML = toggle; },
+    async watched() { await new Promise(resolve => dom.window.setTimeout(resolve, 150)); await settle(); },
     visible() { visibility = 'visible'; document.dispatchEvent(new dom.window.Event('visibilitychange')); }};
 }
 
@@ -244,6 +249,87 @@ test('opening in a background tab waits for visibility without consuming the int
   assert.equal(p.data[seen], undefined); assert.equal(p.card(), null);
   p.visible(); await settle();
   assert.ok(p.card()); controller.dispose();
+});
+
+const title = p => p.card()?.querySelector('h2').textContent;
+const gotIt = p => p.card().querySelector('.learning-announcement-dismiss').click();
+
+test('without a game the tour stops after Learn and the first game shows the engine card', async t => {
+  const p = setup(t, {game: false}), controller = p.mount(); await controller.ready;
+  assert.equal(title(p), INTRO_STEPS[0].title);
+  assert.equal(p.data[pending], true, 'The engine card is owed before anything can interrupt the tour');
+  gotIt(p); await settle();
+  assert.equal(title(p), INTRO_STEPS[1].title);
+  gotIt(p); await settle();
+  assert.equal(p.card(), null, 'Got it on Learn ends the visible tour without a game');
+  assert.deepEqual(p.highlighted(), []);
+  assert.deepEqual(p.settingsChanges, [false], 'Explanations wait for the card that demonstrates them');
+  await p.watched();
+  assert.equal(p.card(), null, 'Nothing shows while the workspace stays empty');
+  p.loadGame(); await p.watched();
+  assert.equal(title(p), 'Engine explanations');
+  assert.equal(p.card().querySelector('.learning-announcement-steps').getAttribute('aria-label'), 'Step 3 of 3');
+  assert.deepEqual(p.highlighted(), ['explanations']);
+  assert.deepEqual(p.settingsChanges, [false, true]);
+  assert.equal(p.data[pending], false);
+  gotIt(p);
+  assert.equal(p.card(), null);
+  p.loadGame(); await p.watched();
+  assert.equal(p.card(), null, 'The engine card shows once');
+  const reopened = p.mount(); await reopened.ready;
+  assert.equal(p.card(), null); reopened.dispose();
+});
+
+for (const dismissal of ['Escape', '[data-section=learn]', 'pagehide']) {
+  test(`skipping the gameless tour with ${dismissal} still shows the engine card with a game in another tab`, async t => {
+    const blank = setup(t, {game: false}), controller = blank.mount(); await controller.ready;
+    if (dismissal === 'Escape') blank.document.dispatchEvent(new blank.dom.window.KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
+    else if (dismissal === 'pagehide') blank.dom.window.dispatchEvent(new blank.dom.window.Event('pagehide'));
+    else blank.document.querySelector(dismissal).click();
+    assert.equal(blank.card(), null); await settle();
+    assert.deepEqual(blank.settingsChanges, [false]);
+    const tabs = [setup(t, {shared: blank}), setup(t, {shared: blank})];
+    const mounted = tabs.map(tab => tab.mount());
+    await Promise.all(mounted.map(tab => tab.ready));
+    assert.equal(tabs.filter(tab => tab.card()).length, 1, 'Exactly one tab shows the engine card');
+    const shown = tabs.find(tab => tab.card());
+    assert.equal(title(shown), 'Engine explanations');
+    assert.deepEqual(shown.settingsChanges, [true]);
+    gotIt(shown); mounted.forEach(tab => tab.dispose());
+    const later = setup(t, {shared: blank}), again = later.mount(); await again.ready;
+    assert.equal(later.card(), null); again.dispose();
+  });
+}
+
+test('a game loaded during the tour lets it continue straight to engine explanations', async t => {
+  const p = setup(t, {game: false}), controller = p.mount(); await controller.ready;
+  p.loadGame(); gotIt(p); await settle(); gotIt(p); await settle();
+  assert.equal(title(p), 'Engine explanations');
+  assert.deepEqual(p.settingsChanges, [false, true]);
+  assert.equal(p.data[pending], false);
+  gotIt(p); await p.watched();
+  assert.equal(p.card(), null); controller.dispose();
+});
+
+test('closing the game mid-tour defers the engine card to the next game', async t => {
+  const p = setup(t), controller = p.mount(); await controller.ready;
+  assert.equal(p.data[pending], undefined, 'A tour with a game owes nothing');
+  p.document.querySelector('.insight-panel').innerHTML = '';
+  gotIt(p); await settle(); gotIt(p); await settle();
+  assert.equal(p.card(), null);
+  assert.equal(p.data[pending], true);
+  p.loadGame(); await p.watched();
+  assert.equal(title(p), 'Engine explanations'); controller.dispose();
+});
+
+test('the engine card waits while Learn or the profile covers the game', async t => {
+  const p = setup(t, {game: false}), controller = p.mount(); await controller.ready;
+  gotIt(p); await settle(); gotIt(p); await settle();
+  p.document.body.classList.add('has-learning');
+  p.loadGame(); await p.watched();
+  assert.equal(p.card(), null);
+  p.document.body.classList.remove('has-learning'); await p.watched();
+  assert.equal(title(p), 'Engine explanations'); controller.dispose();
 });
 
 test('a missing section button means no tour and no consumed marker', async t => {
