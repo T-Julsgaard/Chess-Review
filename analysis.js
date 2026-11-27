@@ -4867,6 +4867,7 @@ function renderMoveComment() {
   const cfg = cls && QUALITY[cls];
   const explanation = engineReplies ? explainMove({
     beforeFen: S.positions[S.idx - 1].fen, afterFen: S.positions[S.idx].fen, category: cls,
+    earlierFens: S.positions.slice(Math.max(0, S.idx - 13), S.idx - 1).map(position => position.fen),
     viewerSide: S.playerKnown === true ? S.meSide : null,
     beforeScore: S.evals[S.idx - 1], afterScore: S.evals[S.idx],
     beforePv: explanationPv(S.bests[S.idx - 1]), afterPv: explanationPv(S.bests[S.idx]),

@@ -9,6 +9,13 @@ function position(pgn, played) {
   const beforeFen = board.fen(); board.move(played);
   return {beforeFen, afterFen:board.fen(), category:'blunder'};
 }
+// The same, with the game's earlier positions as the review supplies them.
+function game(pgn, played) {
+  const board = new Chess(); board.loadPgn(pgn);
+  const replay = new Chess(), earlierFens = [];
+  for (const move of board.history()) { earlierFens.push(replay.fen()); replay.move(move); }
+  return {...position(pgn, played), earlierFens};
+}
 
 test('explains an immediate mating consequence with a legal, playable alternative', () => {
   const result = explainMove({...position('1. f3 e5', 'g4'),
@@ -108,9 +115,10 @@ test('rendered explanations follow the known player independently of board orien
 test('describes en passant at the captured pawn’s square and does not call an even trade a material win', () => {
   const ep = explainMove({...position('1. e4 a6 2. e5', 'd5'), afterPv:'e5d6'});
   assert.match(ep.summary, /pawn on d5/);
+  // Taking back the pawn is an even trade, so it is not offered as the punishment.
   const trade = explainMove({...position('1. e4 d5', 'exd5'), afterPv:'d8d5 b1c3 d5d8'});
-  assert.match(trade.summary, /capturing the pawn on d5/);
-  assert.equal(trade.detail, '');
+  assert.equal(trade.summary, 'A stronger move was available.');
+  assert.doesNotMatch(trade.summary + trade.detail, /win|undefended|capturing/);
 });
 
 test('rejects illegal PV moves and invalid positions without inventing tactics', () => {
@@ -187,8 +195,11 @@ test('explains loose pieces, removed defenders and captures with a cheaper piece
 });
 
 test('a capture that also checks mentions both, and discovered and double checks are named', () => {
-  const both = explainMove({...position('1. e4 e5 2. Nf3 d6 3. Bc4', 'Be7'), afterPv:'c4f7 e8f7'});
+  const both = explainMove({...position('1. e4 e5 2. Nf3 d6 3. Bc4', 'Be7'), afterPv:'c4f7'});
   assert.equal(both.summary, 'White can reply Bishop f7, capturing the pawn on f7 with check.');
+  // Taken back at once, the same capture only loses a bishop, so it is not the punishment.
+  const sacrifice = explainMove({...position('1. e4 e5 2. Nf3 d6 3. Bc4', 'Be7'), afterPv:'c4f7 e8f7 b1c3'});
+  assert.doesNotMatch(sacrifice.summary, /Bishop f7/);
   const discovered = fromFen('r3k3/8/8/8/4N3/8/8/4R1K1 b - - 0 1', 'Ra7', {category:'blunder', afterPv:'e4c5'});
   assert.equal(discovered.summary, 'White can reply Knight c5, giving a discovered check.');
   assert.equal(discovered.detail, 'The knight moved out of the way, so the rook on e1 now gives check.');
@@ -217,9 +228,10 @@ test('a miss leads with the tactic that was available, and weak moves name a bet
     {category:'miss', beforeScore:{cp:-500}, afterScore:{cp:0}, beforePv:'b4c2 e1d2 c2a1'});
   assert.equal(miss.summary, 'This misses Knight c2, forking the king and the rook on a1.');
   assert.equal(miss.detail, '');
-  const better = explainMove({...position('1. e4 e5 2. Nf3 Nc6 3. Nxe5', 'a6'),
+  const better = explainMove({...game('1. e4 e5 2. Nf3 Nc6 3. Nxe5', 'a6'),
     beforeScore:{cp:0}, afterScore:{cp:300}, beforePv:'c6e5', afterPv:'d2d4'});
-  assert.equal(better.detail, 'Better was Knight e5.');
+  assert.equal(better.summary, 'This gives White a much stronger position.');
+  assert.equal(better.detail, 'Better was Knight e5, winning a knight for a pawn.');
 });
 
 test('weak moves without scores still name the strongest reply instead of a vague line', () => {
@@ -234,7 +246,7 @@ test('good moves describe what they do on the board', () => {
   const skewer = fromFen('K7/8/7r/8/5k2/8/8/2B5 w - - 0 1', 'Bd2+', {category:'excellent'});
   assert.equal(skewer.summary, 'This skewers the king and the rook on h6 behind it.');
   const mate = fromFen('6k1/5ppp/8/8/8/8/5PPP/3QR1K1 w - - 0 1', 'Qd7', {category:'best', afterScore:{mate:1}, afterPv:'g8f8 d7e8'});
-  assert.equal(mate.summary, 'This keeps a forced mate in 1: 1… King f8 2. Queen e8.');
+  assert.equal(mate.summary, 'This forces mate next move: 1… King f8 2. Queen e8.');
   const book = explainMove({...position('1. e4 e5 2. Nf3', 'Nc6'), category:'book'});
   assert.equal(book.detail, '');
 });
@@ -366,4 +378,49 @@ test('readable move mentions retain legal prefixes and never turn board squares 
   const ep=explainMove({...position('1. e4 a6 2. e5','d5'),afterPv:'e5d6'});
   assert.equal(ep.summaryParts.find(part=>part.move).text,'Pawn d6');
   assert.match(ep.summary,/pawn on d5/);
+});
+
+test('a recapture is a trade, not a capture of an undefended piece', () => {
+  // Bishop takes knight, pawn takes back: the bishop on c6 had no defender, but nothing was won.
+  const pawn = explainMove({...game('1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Bxc6', 'dxc6'), category:'best', afterPv:'b1c3 f7f6'});
+  assert.equal(pawn.summary, 'This recaptures the bishop on c6.');
+  const queen = explainMove({...game('1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3', 'Qxf3'), category:'best', afterPv:'d6e5 f3b3'});
+  assert.equal(queen.summary, 'This recaptures the bishop on f3.');
+  // A pawn won back two moves later is not called undefended either.
+  const later = explainMove({...game('1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3', 'dxe5'), category:'best', afterPv:'f3b3 f8c5'});
+  assert.equal(later.summary, 'This captures the pawn on e5.');
+});
+
+test('a reply is named by the material it wins once the exchange settles', () => {
+  const trap = explainMove({...game('1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Nbd7 5. cxd5 exd5', 'Nxd5'),
+    category:'blunder', viewerSide:'w', beforeScore:{cp:30}, afterScore:{cp:-350}, beforePv:'e2e3',
+    afterPv:'f6d5 g5d8 f8b4 d1d2 b4d2 e1d2 e8d8 e2e4'});
+  assert.equal(trap.summary, 'Your opponent can reply Knight d5, winning a knight for a pawn.');
+  assert.equal(trap.detail, 'You could have played Pawn e3.');
+  // Counted from where the exchange began, the queen recaptured on d2 is not a queen won.
+  const back = explainMove({...game('1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Nbd7 5. cxd5 exd5 6. Nxd5 Nxd5 7. Bxd8 Bb4+ 8. Qd2', 'Bxd2+'),
+    category:'best', afterPv:'e1d2 e8d8 e2e4'});
+  assert.equal(back.summary, 'This captures the queen on d2 with a bishop, giving check.');
+  const knight = explainMove({...game('1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. d3 Be7 5. O-O O-O 6. Re1 d6 7. c3 Be6 8. Bxe6 fxe6 9. Ng5 Qd7', 'Nxe6'),
+    category:'blunder', afterPv:'d7e6 d1b3 e6b3 a2b3'});
+  assert.equal(knight.summary, 'Black can reply Queen e6, winning a knight for a pawn.');
+});
+
+test('a piece taken while the other side takes one back is not called undefended', () => {
+  // After h3 the rook takes the bishop on f4, but the knight on g4 falls in return.
+  const result = explainMove({...game('1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. d3 Be7 5. O-O O-O 6. Re1 d6 7. c3 Be6 8. Bxe6 fxe6 9. Ng5 Qd7 10. Nxe6 Qxe6 11. f4 exf4 12. Bxf4 Ng4', 'h3'),
+    category:'inacc', afterPv:'f8f4 h3g4 e7h4 e1e2'});
+  assert.doesNotMatch(result.summary + result.detail, /undefended|winning/);
+});
+
+test('an even trade the reply offers falls back to the evaluation and the better move', () => {
+  const result = explainMove({...game('1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. d3 Nf6', 'Be3'),
+    category:'inacc', beforeScore:{cp:30}, afterScore:{cp:-20}, beforePv:'c2c3', afterPv:'c5e3 f2e3'});
+  assert.equal(result.summary, 'This gives Black a better position.');
+  assert.equal(result.detail, 'Better was Pawn c3.');
+});
+
+test('a move out of attack says what it escaped', () => {
+  const result = explainMove({...game('1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be3 e5', 'Nb3'), category:'best'});
+  assert.equal(result.summary, 'The knight moves to safety from the pawn on e5.');
 });
