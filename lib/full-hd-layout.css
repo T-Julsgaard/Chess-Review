@@ -127,8 +127,8 @@ body:has(.full-hd-reference) .learning-embedded .learn-shell {
 /* Stacked layouts keep normal text sizes and the same panel styling. */
 .stage.auto.reference-components:not(.full-hd-reference) .mod[data-mod="engine"] {min-height:180px;}
 .stage.auto.reference-components:not(.full-hd-reference) .mod[data-mod="coach"] {width:120px;height:123px;}
-.stage.auto.reference-components:not(.full-hd-reference).has-coach .insight-panel .ip-opening {padding-right:128px;}
-.stage.auto.reference-components:not(.full-hd-reference).has-coach .ip-text::before {width:116px;height:38px;}
+.stage.auto.reference-components:not(.full-hd-reference).has-coach .insight-panel .ip-opening {padding-right:178px;}
+.stage.auto.reference-components:not(.full-hd-reference).has-coach .ip-text::before {width:166px;height:38px;}
 .stage.auto.reference-components:not(.full-hd-reference) .panel-head {flex-wrap:wrap;}
 @media (max-width:819.98px) {
  .stage.auto.reference-components .player-strip {padding:4px;gap:8px;}

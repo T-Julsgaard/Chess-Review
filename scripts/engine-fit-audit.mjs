@@ -24,6 +24,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       sectionGaps:sections.slice(1).map((r,i)=>r.top-sections[i].bottom),
       allGaps:[players.top-nav.bottom,sections[0].top-players.bottom,...sections.slice(1).map((r,i)=>r.top-sections[i].bottom)],
       accuracyZoom:Number(page.querySelector('.acc-fit-content').style.zoom||1),
+      accuracyCompact:page.querySelector('.acc-fit-content').classList.contains('acc-compact'),
       overflow:body.scrollHeight-body.clientHeight,
       clipped:items.filter(n=>{const r=n.getBoundingClientRect();const p=panel.getBoundingClientRect();return r.top<p.top-.5||r.bottom>p.bottom+.5;}).length,
       accuracyOverflow:page?page.scrollHeight-page.clientHeight:0,
@@ -75,7 +76,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
         sizes.push({count, ...fit});
       }
       const [three, two, one] = sizes, gap = three.engine.top-three.accuracy.bottom;
-      const fullSize=sizes.filter(s=>s.accuracyZoom===1);
+      const fullSize=sizes.filter(s=>s.accuracyZoom===1&&!s.accuracyCompact);
       for (const fit of fullSize) {
         const extra=fit.allGaps.map((value,i)=>value-fullSize[0].allGaps[i]);
         assert.ok(Math.max(...extra)-Math.min(...extra)<.5,
@@ -169,7 +170,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await waitFor(review, "chrome.storage.local.get('settings').then(s=>s.settings.uiSetup==='custom')", 'Custom edit');
   const frozen = await measure();
   for (const key of ['accuracy', 'engine', 'learn']) for (const prop of ['top', 'bottom'])
-    assert.ok(Math.abs(frozen[key][prop]-fitted[key][prop])<1, `Editing keeps the fitted ${key}.${prop}`);
+    assert.ok(Math.abs(frozen[key][prop]-fitted[key][prop])<1, `Editing keeps the fitted ${key}.${prop} `+JSON.stringify({fitted:fitted[key],frozen:frozen[key]}));
   for (const count of [2, 3]) {
     await render(count); await settle();
     const custom = await measure(), context = JSON.stringify({count, fitted, custom});

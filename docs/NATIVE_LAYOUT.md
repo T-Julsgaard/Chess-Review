@@ -22,6 +22,19 @@ rows, Accuracy categories, Engine controls and Insight typography retain the
 reference character. Narrow windows reflow the layout instead of shrinking a
 desktop screenshot. Portrait and landscape use the actual available CSS viewport.
 
+Laptop arrangements keep the desktop proportions where it matters: the coach keeps
+the same inset from the review panel's right edge, so it never covers the Engine
+explanations switch or the close button. Accuracy and Quality never scroll at any
+viewport or display scale (100%, 125%, 150%): a short panel first switches the
+overview to a compact arrangement of the same figures (phases and ratings on one
+line, smaller dials), Quality tightens its rows, and only a small remainder is
+zoomed. Sub-pixel remainders at fractional scaling are hidden rather than drawing a
+scroll bar. Advanced is a long list and keeps its own scrolling. Playstyle chapters
+are fitted to their panel rather than scrolled; on boards shorter than the desktop
+one the deck also grows into the empty player-strip margins and tightens its header
+and chapter buttons. When the floating Feedback button would still touch the
+section rail after tucking to its icon, the rail ends just above it.
+
 Desktop page bounds stay fixed when Accuracy expands; content extending beyond
 the viewport is clipped. Panel bodies can still scroll. Narrow and short windows
 scroll vertically so every section remains reachable. No layout requires
@@ -68,6 +81,12 @@ Run these against the working tree in an isolated Chrome extension profile:
 - `node scripts/learning-browser.mjs --working-tree --full-hd-reference`
   compares Full HD panel/content dimensions with revision 8516f684 at 87%, then
   checks Reorganize, Reset and reload against the approved physical sizes.
+- `node scripts/learning-browser.mjs --working-tree --laptop-fit` checks 22
+  laptop/desktop viewports at 100%, 125% and 150% display scaling: no scroll bar
+  in Accuracy, Quality or Engine for one to three lines (including after the
+  panel's add/remove buttons), readable Accuracy text, coach clear of the
+  explanations switch (also in stacked layouts), rail clear of Feedback, and every
+  Playstyle chapter shown without scrolling.
 - `--viewport-preview` checks the live Screen sizes viewer, rotation, fullscreen,
   and isolation from saved user data.
 

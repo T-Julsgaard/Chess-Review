@@ -283,3 +283,46 @@
 
 /* A gentler version scales the original rows, cards or compact list uniformly. */
 .moves-panel[data-design="zoom20"] .movelist { zoom: 1.2; }
+
+/* Fitted Accuracy pages never scroll (scheduleAccuracyFit). A sub-pixel remainder
+   at fractional display scaling (125%, 150%) must not draw a scroll bar either. */
+.stage .mod .accuracy-panel .acc-fit-page { overflow-y: hidden; }
+/* Short panels (laptops, scaled displays): the same figures in a tighter
+   arrangement, before any zoom. Phases and ratings read across one line. */
+.stage .accuracy-phase-modern .acc-compact .acc-players { margin-bottom: 4px; }
+.stage .accuracy-phase-modern .acc-compact .phase-overview { gap: 4px; }
+.stage .accuracy-phase-modern .acc-compact .phase-overall-values { margin-top: 1px; }
+.stage .accuracy-phase-modern .acc-compact .acc-dial { max-width: 62px; }
+.stage .accuracy-phase-modern .acc-compact .phase-overall-values .acc-val { font-size: 19px; letter-spacing: -.8px; }
+.stage .accuracy-phase-modern .acc-compact .phase-report { gap: 4px; }
+.stage .accuracy-phase-modern .acc-compact :is(.phase-report-row, .phase-rating) {
+  display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 6px; }
+.stage .accuracy-phase-modern .acc-compact :is(.phase-report-cells, .phase-rating-values) { display: contents; }
+.stage .accuracy-phase-modern .acc-compact :is(.phase-report-cell, .acc-elo):first-child { order: -1; }
+.stage .accuracy-phase-modern .acc-compact .phase-report-name { min-width: 52px; }
+.stage .accuracy-phase-modern .acc-compact .phase-report-name::before,
+.stage .accuracy-phase-modern .acc-compact .phase-report-name::after { content: none; }
+.stage .accuracy-phase-modern .acc-compact .phase-report-cell { padding: 4px 3px; }
+.stage .accuracy-phase-modern .acc-compact .phase-report-score { font-size: 17px; }
+.stage .accuracy-phase-modern .acc-compact .phase-rating { padding-top: 5px; }
+.stage .accuracy-phase-modern .acc-compact .phase-rating > .acc-elo-label { max-width: 62px; font-size: 10px; line-height: 1.15; }
+.stage .accuracy-phase-modern .acc-compact .phase-rating-values .acc-elo { font-size: 17px; text-align: center; }
+/* The shortest windows (1080p at 150% with bookmarks): drop the dial rings and
+   tighten every row; the figures keep their size relative to the names. */
+.stage .accuracy-phase-modern .acc-compact-tight .acc-players { margin-bottom: 2px; }
+.stage .accuracy-phase-modern .acc-compact-tight .acc-player { padding-block: 3px; }
+.stage .accuracy-phase-modern .acc-compact-tight .phase-overview { gap: 2px; }
+.stage .accuracy-phase-modern .acc-compact-tight .phase-summary-label { display: none; }
+.stage .accuracy-phase-modern .acc-compact-tight .acc-dial { max-width: none; aspect-ratio: auto; height: 26px; margin: 0; }
+.stage .accuracy-phase-modern .acc-compact-tight .acc-dial svg { display: none; }
+.stage .accuracy-phase-modern .acc-compact-tight .phase-overall-values .acc-val { font-size: 21px; }
+.stage .accuracy-phase-modern .acc-compact-tight .phase-report { gap: 2px; }
+.stage .accuracy-phase-modern .acc-compact-tight .phase-report-cell { padding: 2px 3px; border-radius: 6px; }
+.stage .accuracy-phase-modern .acc-compact-tight .phase-report-score { font-size: 15px; }
+.stage .accuracy-phase-modern .acc-compact-tight .phase-rating { padding-top: 3px; }
+.stage .accuracy-phase-modern .acc-compact-tight .phase-rating-values .acc-elo { font-size: 15px; }
+/* Past its legible minimum (the shortest windows only), Quality scrolls quietly:
+   no scroll bar, a fade where the list continues. */
+.stage .mod .accuracy-panel .acc-fit-page.acc-fit-scroll { overflow-y: auto; scrollbar-width: none;
+  mask-image: linear-gradient(180deg, #000 calc(100% - 22px), transparent); }
+.stage .mod .accuracy-panel .acc-fit-page.acc-fit-scroll::-webkit-scrollbar { display: none; }

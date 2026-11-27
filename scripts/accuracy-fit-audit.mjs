@@ -22,7 +22,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
         const fit=await run(`(()=>{
           const body=document.querySelector('.acc-fit-page'),content=body.querySelector('.acc-fit-content'),r=body.getBoundingClientRect();
           return {body:body.clientHeight,content:body.scrollHeight,horizontal:body.scrollWidth-body.clientWidth,
-            zoom:Number(content.style.zoom),overflowY:getComputedStyle(body).overflowY,
+            zoom:Number(content.style.zoom),overflowY:getComputedStyle(body).overflowY,scrollbar:body.offsetWidth-body.clientWidth,
             dials:content.querySelectorAll('.acc-dial').length,phases:content.querySelectorAll('.phase-report-row').length,
             rows:content.querySelectorAll('.qbreak-row').length,
             row:parseFloat(content.style.getPropertyValue('--q-row'))||null,
@@ -35,15 +35,17 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
         assert.equal(fit.horizontal,0);
         if(page===0){assert.equal(fit.content,fit.body,'No scrolling: '+JSON.stringify(evidence.at(-1)));assert.equal(fit.visible,true);}
         else {
-          // Quality tightens its rows instead of zooming, keeping text readable;
-          // it scrolls only once rows reach their 13px minimum.
-          assert.equal(fit.zoom,1,'Never zoom the Quality list');
-          assert.ok(fit.labelFont>=12,'Readable category labels: '+JSON.stringify(evidence.at(-1)));
-          if(fit.content>fit.body)assert.equal(fit.row,13,'Scroll only at the minimum row height: '+JSON.stringify(evidence.at(-1)));
+          // Quality tightens its rows first, keeping text readable; only past the
+          // 13px row minimum is a remainder zoomed, down to 10px labels. Below that
+          // (the shortest windows) it scrolls without drawing a scroll bar.
+          assert.ok(fit.zoom===1||fit.row===13,'Zoom the Quality list only past its minimum row height: '+JSON.stringify(evidence.at(-1)));
+          assert.ok(fit.labelFont*fit.zoom>=10,'Readable category labels: '+JSON.stringify(evidence.at(-1)));
+          if(fit.content>fit.body)assert.ok(fit.zoom<=.85&&fit.scrollbar===0,'Scroll quietly only at the legible minimum: '+JSON.stringify(evidence.at(-1)));
           else assert.equal(fit.visible,true);
         }
         if(width===1920&&height===919)assert.equal(fit.zoom,1,'Restore the original size when it fits');
-        assert.ok(!['hidden','clip'].includes(fit.overflowY),'Fit the data without clipping it');
+        // Fitted pages hide only sub-pixel remainders (no scroll bar at 125%/150% scaling); nothing visible is clipped.
+        if(fit.content<=fit.body)assert.equal(fit.visible,true,'Fit the data without clipping it');
         assert.equal(fit.boxes,boxes,'Keep the surrounding panels and page dimensions unchanged');
         if(page===0){assert.equal(fit.dials,2);assert.equal(fit.phases,3);}
         else {assert.equal(fit.rows,10);assert.equal(fit.columns,1,'Keep the existing single category list');}

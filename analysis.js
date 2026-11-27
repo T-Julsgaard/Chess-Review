@@ -1804,11 +1804,34 @@ function placeSectionRail() {
   // The floating Feedback pill tucks down to its icon when the rail's last label would touch it.
   const feedback = document.querySelector(".app > .feedback-floating");
   if (!feedback) return;
+  // Measure where both come to rest: the rail glides to its new place and the pill
+  // eases between its sizes, so their painted boxes may still be on the way.
+  const settled = tucked => {
+    feedback.style.transition = "none";
+    feedback.classList.toggle("rail-tucked", tucked);
+    const pill = feedback.getBoundingClientRect();
+    feedback.style.transition = "";
+    return pill;
+  };
+  const touching = tucked => {
+    const pill = settled(tucked), nav = sectionRail.element, painted = nav.getBoundingClientRect();
+    const left = parseFloat(nav.style.left), top = parseFloat(nav.style.top), height = parseFloat(nav.style.height);
+    const rail = Number.isFinite(left + top + height) ? {left, top, right:left + painted.width, bottom:top + height} : painted;
+    return pill.width && pill.left < rail.right + 8 && pill.right > rail.left - 8 && pill.top < rail.bottom + 8 && pill.bottom > rail.top - 8 ? pill : null;
+  };
+  const was = feedback.classList.contains("rail-tucked");
   feedback.classList.remove("rail-tucked");
-  if (!besidePanels) return;
-  const pill = feedback.getBoundingClientRect(), rail = sectionRail.element.getBoundingClientRect();
-  const touches = pill.width && pill.left < rail.right + 8 && pill.right > rail.left - 8 && pill.top < rail.bottom + 8 && pill.bottom > rail.top - 8;
-  feedback.classList.toggle("rail-tucked", touches);
+  if (!besidePanels || !touching(false)) {
+    // Restore the previous size without a jump, then let it ease open.
+    if (was) { settled(true); void feedback.offsetWidth; feedback.classList.remove("rail-tucked"); }
+    return;
+  }
+  // On laptops the rail reaches the window's bottom edge, so even the tucked icon can
+  // sit on its last button: end the rail just above it.
+  const pill = touching(true);
+  if (pill) sectionRail.place(sectionRailTarget(), {top:topbar?.bottom || 0, hidden:S.reorganize, bottom:pill.top - 8});
+  // A newly tucked pill eases down to its icon from where it was.
+  if (!was) { settled(false); void feedback.offsetWidth; feedback.classList.add("rail-tucked"); }
 }
 function scheduleSectionRail() {
   if (!sectionRailFrame) sectionRailFrame = window.requestAnimationFrame ? window.requestAnimationFrame(placeSectionRail) : setTimeout(placeSectionRail, 16);
@@ -5493,23 +5516,39 @@ function scheduleAccuracyFit() {
     // Keep the original design and fit its contents proportionally. Reset before
     // measuring so a larger window restores the full size; never enlarge it.
     content.style.zoom = '1';
-    content.classList.remove('acc-dense');
+    content.classList.remove('acc-dense', 'acc-compact', 'acc-compact-tight');
+    page.classList.remove('acc-fit-scroll');
     content.style.removeProperty('--q-row');
     if (page.scrollHeight <= page.clientHeight) return;
-    if (page.classList.contains('acc-page-quality') && fitQualityRows(page, content)) return;
+    // Short panels (laptops, scaled displays) first switch to a compact
+    // arrangement of the same figures, so they stay readable at full size.
+    if (page.classList.contains('acc-page-quality') && fitQualityRows(page, content)
+      && page.scrollHeight <= page.clientHeight) return;
+    if (page.classList.contains('acc-page-overview') && content.querySelector('.phase-overview')) {
+      content.classList.add('acc-compact');
+      if (page.scrollHeight <= page.clientHeight) return;
+      content.classList.add('acc-compact-tight');
+      if (page.scrollHeight <= page.clientHeight) return;
+    }
+    // Quality's category labels stay legible: past QUALITY_ZOOM_MIN the list
+    // scrolls instead, without a visible scroll bar (only the shortest windows).
+    const floor = page.classList.contains('acc-page-quality') ? QUALITY_ZOOM_MIN : 0;
     for (let i = 0; i < 3; i++) {
-      const scale = Math.min(1, available / content.scrollHeight);
+      const scale = Math.max(floor, Math.min(1, available / content.scrollHeight));
       if (!Number.isFinite(scale) || scale <= 0) break;
       content.style.zoom = String(scale);
-      if (page.scrollHeight <= page.clientHeight) break;
+      if (page.scrollHeight <= page.clientHeight || scale === floor) break;
     }
+    page.classList.toggle('acc-fit-scroll', page.scrollHeight > page.clientHeight);
   });
 }
 // Zooming the whole Quality list made its text unreadable in short panels
 // (6–8px at a 1080p screen with 150% scaling). Instead, tighten the rows so they
 // share the free height, keeping the text at 12px or larger. Below that minimum
-// the page scrolls rather than shrinking further.
+// only a small remainder is zoomed away, down to QUALITY_ZOOM_MIN (10px labels).
+// Accuracy pages never show a scroll bar.
 const QUALITY_ROW_MIN = 13;
+const QUALITY_ZOOM_MIN = .85;
 function fitQualityRows(page, content) {
   const rows = content.querySelectorAll('.qbreak-row');
   if (!rows.length) return false;

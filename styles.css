@@ -2224,9 +2224,10 @@ button { font-family: inherit; cursor: pointer; }
 .stage.auto .mod[data-mod="engine"] .engine-body { padding:8px; }
 .stage.auto .mod[data-mod="engine"] .engine-line { height:32px; padding:4px; }
 .stage.auto .mod[data-mod="engine"] .engine-bestwalk { padding:6px; min-height:30px; margin-top:6px; font-size:11.5px; }
-.stage.auto .mod[data-mod="coach"] { grid-area:review; justify-self:end; align-self:start; width:100px; height:102px; margin:0 8px; }
-.stage.auto.has-coach .ip-opening { padding-right:108px; }
-.stage.auto.has-coach .ip-head { padding-right:108px; }
+/* The coach leaves the panel's top-right corner to the Engine explanations switch and close button. */
+.stage.auto .mod[data-mod="coach"] { grid-area:review; justify-self:end; align-self:start; width:100px; height:102px; margin:0 var(--coach-corner,58px) 0 8px; }
+.stage.auto.has-coach .ip-opening { padding-right:158px; }
+.stage.auto.has-coach .ip-head { padding-right:158px; }
 .stage .ip-body { min-height:0; overflow:auto; padding:8px 10px; gap:6px; }
 .stage .ip-head:empty:where(:not(.ip-head-spacer)) { display:none; }
 .stage .ip-head { min-height:24px; }
@@ -2246,15 +2247,15 @@ button { font-family: inherit; cursor: pointer; }
   .stage.auto .mod[data-mod="moves"] { flex:1; min-height:0; }
   .stage.auto .mod[data-mod="accuracy"] { flex:1; min-height:0; }
   .stage.auto .mod[data-mod="engine"], .stage.auto .mod[data-mod="graph"], .stage.auto .mod[data-mod="controls"], .stage.auto .mod[data-mod="learn"] { flex:none; }
-  .stage.auto .mod[data-mod="coach"] { position:absolute; right:8px; top:0; width:152px; height:155px; margin:0; }
-  .stage.auto.has-coach .ip-opening { padding-right:156px; }
-  .stage.auto.has-coach .ip-head { padding-right:156px; }
+  .stage.auto .mod[data-mod="coach"] { position:absolute; right:var(--coach-corner,58px); top:0; width:152px; height:155px; margin:0; }
+  .stage.auto.has-coach .ip-opening { padding-right:206px; }
+  .stage.auto.has-coach .ip-head { padding-right:206px; }
 }
 @media (min-width:1100px) and (min-height:480px) and (max-height:799.98px) {
   .stage { --strip-h:44px; --review-h:100px; --gap:10px; }
   .stage.auto .side { padding-top:0; }
-  .stage.auto .mod[data-mod="coach"] { width:100px; height:102px; right:0; }
-  .stage.auto.has-coach .ip-opening, .stage.auto.has-coach .ip-head { padding-right:100px; }
+  .stage.auto .mod[data-mod="coach"] { width:100px; height:102px; right:50px; }
+  .stage.auto.has-coach .ip-opening, .stage.auto.has-coach .ip-head { padding-right:150px; }
   .stage .qbreak { gap:3px; margin-top:8px; }
   .stage .qbreak-row { font-size:11px; }
   .stage .qbreak-row .qsym { width:18px; height:18px; flex-basis:18px; }

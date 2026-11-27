@@ -560,3 +560,11 @@
 .pv-endings-name { font-weight: 650; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pv-endings-count { font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .pv-endings-share { min-width: 3em; text-align: right; font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--ink); }
+
+/* Laptops and scaled displays: the chapter is fitted to the panel (workspace fitSlide)
+   rather than scrolled, and a short panel tightens its header and chapter buttons. */
+.profile-slide-host.profile-slide-fit { overflow-y: hidden; }
+.profile-shell.profile-short[data-design="story"] .profile-head { padding: 8px 16px 4px; }
+.profile-shell.profile-short .pv-story-host { padding: 6px 22px 8px !important; }
+.profile-shell.profile-short .profile-nav.pv-story-nav { padding: 6px 14px 10px; }
+.profile-shell.profile-short .pv-story-nav > :is(.pv-next, .pv-prev) { min-height: 40px; padding-block: 5px; }
