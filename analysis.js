@@ -1781,14 +1781,20 @@ function currentSection() {
 }
 // The review's panel column, which the rail stands beside in every section. Learning and the profile
 // only hide those panels (they keep their layout), so the rail never moves or stretches on a switch.
+// While the board stands beside the panels the rail spans the board's squares, top to bottom: on
+// laptops the controls row under the panels reaches past the board's last rank. Learn docks the
+// board elsewhere and leaves an anchor of the same size in its place, which the rail keeps to.
 function sectionRailTarget() {
   if (!UI.canvas) return null;
   const rects = [...UI.canvas.querySelectorAll(".mod")]
     .filter(mod => !["evalbar", "board", "coach"].includes(mod.dataset.mod) && !mod.hidden && getComputedStyle(mod).display !== "none")
     .map(mod => mod.getBoundingClientRect()).filter(rect => rect.width && rect.height);
   if (!rects.length) return null;
-  const left = Math.min(...rects.map(r => r.left)), top = Math.min(...rects.map(r => r.top));
-  const right = Math.max(...rects.map(r => r.right)), bottom = Math.max(...rects.map(r => r.bottom));
+  const left = Math.min(...rects.map(r => r.left));
+  const right = Math.max(...rects.map(r => r.right));
+  let top = Math.min(...rects.map(r => r.top)), bottom = Math.max(...rects.map(r => r.bottom));
+  const board = UI.canvas.querySelector('.mod[data-mod="board"] :is(.board-wrap > .board, .learn-board-anchor)')?.getBoundingClientRect();
+  if (board?.height && board.right <= left + 1 && board.top < bottom && board.bottom > top) ({top, bottom} = board);
   return {left, top, right, bottom, width:right-left, height:bottom-top};
 }
 function placeSectionRail() {
@@ -1841,6 +1847,8 @@ function watchSectionRail() {
     sectionRailObserver?.disconnect();
     sectionRailObserver = new window.ResizeObserver(scheduleSectionRail);
     sectionRailObserver.observe(UI.canvas);
+    // The board settles its size inside an unchanged canvas; the rail spans its squares.
+    if (UI.boardWrap) sectionRailObserver.observe(UI.boardWrap);
   }
   if (sectionRailWatching) return;
   sectionRailWatching = true;
