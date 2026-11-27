@@ -207,10 +207,12 @@ test('a capture that also checks mentions both, and discovered and double checks
   assert.equal(double.summary, 'White can reply Knight f6, giving double check.');
 });
 
-test('quotes a mating line only when the board confirms it mates in the reported distance', () => {
+test('a forced mate names its distance without spelling out the mating moves', () => {
   const inputs = {category:'blunder', beforeScore:{cp:-200}, afterScore:{mate:-2}};
   const shown = fromFen('k2q4/pp6/8/8/8/8/4RPPP/R5K1 w - - 0 1', 'Ra3', {...inputs, afterPv:'d8d1 e2e1 d1e1'});
-  assert.equal(shown.detail, 'Mating line: 1… Queen d1 2. Rook e1 Queen e1.');
+  assert.equal(shown.summary, 'This allows mate in 2 for Black.');
+  assert.equal(shown.detail, '');
+  assert.equal(shown.threat.text, 'Queen d1');
   const short = fromFen('k2q4/pp6/8/8/8/8/4RPPP/R5K1 w - - 0 1', 'Ra3', {...inputs, afterPv:'d8d1 e2e1'});
   assert.equal(short.summary, 'This allows mate in 2 for Black.');
   assert.equal(short.detail, '');
@@ -246,7 +248,8 @@ test('good moves describe what they do on the board', () => {
   const skewer = fromFen('K7/8/7r/8/5k2/8/8/2B5 w - - 0 1', 'Bd2+', {category:'excellent'});
   assert.equal(skewer.summary, 'This skewers the king and the rook on h6 behind it.');
   const mate = fromFen('6k1/5ppp/8/8/8/8/5PPP/3QR1K1 w - - 0 1', 'Qd7', {category:'best', afterScore:{mate:1}, afterPv:'g8f8 d7e8'});
-  assert.equal(mate.summary, 'This forces mate next move: 1… King f8 2. Queen e8.');
+  assert.equal(mate.summary, 'This forces mate next move.');
+  assert.equal(mate.detail, '');
   const book = explainMove({...position('1. e4 e5 2. Nf3', 'Nc6'), category:'book'});
   assert.equal(book.detail, '');
 });
@@ -361,10 +364,10 @@ test('Dopamine explanations and exploration are opt-in and leave scores and Norm
 });
 
 test('readable move mentions retain legal prefixes and never turn board squares into links', () => {
-  const shown=fromFen('k2q4/pp6/8/8/8/8/4RPPP/R5K1 w - - 0 1','Ra3',
-    {category:'blunder',afterScore:{mate:-2},afterPv:'d8d1 e2e1 d1e1'});
+  const shown=fromFen('6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1','h3',
+    {category:'blunder',beforeScore:{mate:1},afterScore:{cp:300},beforePv:'e1e8'});
   assert.deepEqual(shown.detailParts.filter(part=>part.move).map(part=>[part.text,part.move.uci,part.move.plyOffset]),[
-    ['Queen d1','d8d1',0],['Rook e1','d8d1 e2e1',0],['Queen e1','d8d1 e2e1 d1e1',0],
+    ['Rook e8','e1e8',-1],
   ]);
   assert.ok(shown.detailParts.filter(part=>part.move).every(part=>part.move.category==='best'));
   const pin=explainMove({...position('1. e4 e5 2. Nf3 d6 3. d4','Nc6'),category:'inacc',afterPv:'f1b5'});
