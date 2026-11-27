@@ -147,6 +147,24 @@ test('puzzle hints use the configured best-move arrow and reset for the next sol
   await w.close();
 });
 
+test('the puzzle Hint button fills halfway, then fully, with one wave per press',async t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const {w,doc}=await setup(t);
+  const puzzle={id:'hint-fill',fen:new Chess().fen(),solution:['e2e4','e7e5','g1f3'],rating:1200,themes:[],theme:'fork',source:{url:'https://lichess.org/training'}};
+  w.puzzles=[puzzle];await w.startPuzzleSelection([puzzle]);
+  const hint=()=>doc.querySelector('.puzzle-practice-actions .puzzle-hint');
+  const button=hint();assert.equal(button.dataset.level,'0');assert.equal(button.dataset.wave,undefined);
+  await w.hintPuzzle();
+  assert.equal(hint(),button,'the same button stays mounted so its fill can animate');
+  assert.equal(button.dataset.level,'1');assert.equal(button.dataset.wave,'1');
+  t.mock.timers.tick(700);assert.equal(button.dataset.wave,undefined);
+  w.render();assert.equal(button.dataset.wave,undefined,'re-rendering never replays the wave');
+  await w.hintPuzzle();assert.equal(button.dataset.level,'2');assert.equal(button.dataset.wave,'2');
+  await w.hintPuzzle();assert.equal(button.dataset.level,'2');
+  t.mock.timers.tick(700);assert.equal(button.dataset.wave,undefined);
+  await w.close();
+});
+
 test('puzzle hint highlights survive pickup, deselection, cancellation and wrong moves until the correct move',async t=>{
   const {a,w,doc,board,down,up,event}=await setup(t);
   const puzzle={id:'persistent-hint',fen:new Chess().fen(),solution:['e2e4'],rating:1200,themes:[],theme:'fork',source:{url:'https://lichess.org/training'}};

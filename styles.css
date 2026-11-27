@@ -646,6 +646,57 @@
 @media (max-width:360px) { .puzzle-practice-actions .puzzle-hint, .puzzle-practice-actions .puzzle-skip { min-width: 80px; } }
 .puzzle-hint, .puzzle-skip { background: transparent; border-color: color-mix(in srgb, var(--line) 72%, var(--ink-2)); color: var(--ink-2); }
 .puzzle-hint:disabled, .puzzle-skip:disabled { opacity: 1; cursor: default; }
+/* Hint and Skip share the raised, faintly green look of "Return to puzzle overview". */
+.puzzle-practice-actions :is(.puzzle-hint, .puzzle-skip) {
+  background: color-mix(in oklab,var(--accent) 5%,var(--panel));
+  border-color: color-mix(in oklab,var(--ink-2) 55%,var(--line));
+  color: var(--ink); box-shadow: 0 1px 2px #00000014;
+  transition: background .18s,border-color .18s,box-shadow .18s;
+}
+.puzzle-practice-actions :is(.puzzle-hint, .puzzle-skip):hover:not(:disabled) { background: color-mix(in oklab,var(--accent) 12%,var(--panel)); border-color: var(--accent); box-shadow: 0 3px 8px #0000001a; }
+.puzzle-practice-actions :is(.puzzle-hint, .puzzle-skip):active:not(:disabled) { background: color-mix(in oklab,var(--accent) 17%,var(--panel)); box-shadow: inset 0 1px 3px #0000001a; }
+/* Hint fills like liquid: halfway after the first hint (the piece), full after the second
+   (the arrow). ::before is the liquid — a green that deepens toward the bottom — and ::after
+   the wave crest, a lighter green, that rides its surface while it rises. The rise only plays
+   while data-wave is set (on the press), so re-renders never replay it. */
+.puzzle-practice-actions .puzzle-hint { position: relative; overflow: hidden; isolation: isolate; --hint-fill: 0%; }
+.puzzle-practice-actions .puzzle-hint[data-level="1"] { --hint-fill: 50%; border-color: color-mix(in oklab,var(--accent) 60%,var(--line)); }
+.puzzle-practice-actions .puzzle-hint[data-level="2"] { --hint-fill: 100%; border-color: var(--accent); }
+.puzzle-practice-actions .puzzle-hint::before,
+.puzzle-practice-actions .puzzle-hint::after { content: ""; position: absolute; left: 0; right: 0; z-index: -1; pointer-events: none; }
+.puzzle-practice-actions .puzzle-hint::before {
+  bottom: 0; height: var(--hint-fill);
+  background: color-mix(in oklab,var(--accent) 26%,var(--panel)) linear-gradient(to top, color-mix(in oklab,var(--accent) 42%,var(--panel)), color-mix(in oklab,var(--accent) 26%,var(--panel))) bottom / 100% 46px no-repeat;
+}
+.puzzle-practice-actions .puzzle-hint::after {
+  bottom: calc(var(--hint-fill) - 1px); height: 7px; opacity: 0;
+  background: color-mix(in oklab,var(--accent) 34%,var(--panel));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 7'%3E%3Cpath d='M0 3.5Q6 0 12 3.5T24 3.5V7H0Z'/%3E%3C/svg%3E") 0 0 / 24px 7px repeat-x;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 7'%3E%3Cpath d='M0 3.5Q6 0 12 3.5T24 3.5V7H0Z'/%3E%3C/svg%3E") 0 0 / 24px 7px repeat-x;
+}
+.puzzle-practice-actions .puzzle-hint[data-wave="1"]::before { animation: puzzle-hint-rise-1 .55s cubic-bezier(.3,.8,.35,1); }
+.puzzle-practice-actions .puzzle-hint[data-wave="2"]::before { animation: puzzle-hint-rise-2 .55s cubic-bezier(.3,.8,.35,1); }
+/* The crest rises on exactly the liquid's curve (same duration and easing, so no gap opens
+   between them) while a second, linear animation rolls the wave sideways and fades it out. */
+.puzzle-practice-actions .puzzle-hint[data-wave="1"]::after { animation: puzzle-hint-crest-rise-1 .55s cubic-bezier(.3,.8,.35,1), puzzle-hint-crest-roll-1 .65s linear; }
+.puzzle-practice-actions .puzzle-hint[data-wave="2"]::after { animation: puzzle-hint-crest-rise-2 .55s cubic-bezier(.3,.8,.35,1), puzzle-hint-crest-roll-2 .65s linear; }
+@keyframes puzzle-hint-rise-1 { from { height: 0; } to { height: 50%; } }
+@keyframes puzzle-hint-rise-2 { from { height: 50%; } to { height: 100%; } }
+@keyframes puzzle-hint-crest-rise-1 { from { bottom: -1px; } to { bottom: calc(50% - 1px); } }
+@keyframes puzzle-hint-crest-rise-2 { from { bottom: calc(50% - 1px); } to { bottom: calc(100% - 1px); } }
+@keyframes puzzle-hint-crest-roll-1 {
+  0% { opacity: 1; -webkit-mask-position: 0 0; mask-position: 0 0; } 75% { opacity: 1; }
+  100% { opacity: 0; -webkit-mask-position: -72px 0; mask-position: -72px 0; }
+}
+@keyframes puzzle-hint-crest-roll-2 {
+  0% { opacity: 1; -webkit-mask-position: 0 0; mask-position: 0 0; } 75% { opacity: 1; }
+  100% { opacity: 0; -webkit-mask-position: -72px 0; mask-position: -72px 0; }
+}
+.learning-workspace[data-motion="off"] .puzzle-practice-actions .puzzle-hint::before,
+.learning-workspace[data-motion="off"] .puzzle-practice-actions .puzzle-hint::after { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .puzzle-practice-actions .puzzle-hint::before, .puzzle-practice-actions .puzzle-hint::after { animation: none; }
+}
 .puzzle-session:has(.puzzle-rating-region[data-enabled="false"]) .puzzle-practice-actions { padding-right: 60px; }
 .puzzle-practice-actions .primary, .puzzle-session .puzzle-analyse { width: 140px; max-width: 100%; min-height: 46px; box-sizing: border-box; font-weight: 600; }
 .puzzle-session .puzzle-analyse { justify-self: start; }
