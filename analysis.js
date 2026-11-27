@@ -1779,6 +1779,18 @@ function currentSection() {
   if (learningWorkspace && !learningWorkspace.closing) return "learn";
   return "review";
 }
+// A node's box once its running animations have finished: leaving Learn, the board shrinks back
+// into its slot from Learn's larger size, and the rail must not stretch to follow it there and back.
+// The animations are stepped to their end for the measurement and put straight back.
+function restingRect(node) {
+  if (!node) return null;
+  const running = node.getAnimations?.().filter(a => a.playState !== "finished" && a.currentTime != null) || [];
+  const times = running.map(a => a.currentTime);
+  for (const a of running) { const end = a.effect?.getComputedTiming?.().endTime; if (Number.isFinite(end)) a.currentTime = end; }
+  const rect = node.getBoundingClientRect();
+  running.forEach((a, i) => { a.currentTime = times[i]; });
+  return rect;
+}
 // The review's panel column, which the rail stands beside in every section. Learning and the profile
 // only hide those panels (they keep their layout), so the rail never moves or stretches on a switch.
 // While the board stands beside the panels the rail spans the board's squares, top to bottom: on
@@ -1793,7 +1805,7 @@ function sectionRailTarget() {
   const left = Math.min(...rects.map(r => r.left));
   const right = Math.max(...rects.map(r => r.right));
   let top = Math.min(...rects.map(r => r.top)), bottom = Math.max(...rects.map(r => r.bottom));
-  const board = UI.canvas.querySelector('.mod[data-mod="board"] :is(.board-wrap > .board, .learn-board-anchor)')?.getBoundingClientRect();
+  const board = restingRect(UI.canvas.querySelector('.mod[data-mod="board"] :is(.board-wrap > .board, .learn-board-anchor)'));
   if (board?.height && board.right <= left + 1 && board.top < bottom && board.bottom > top) ({top, bottom} = board);
   return {left, top, right, bottom, width:right-left, height:bottom-top};
 }
@@ -4162,7 +4174,7 @@ function openingStrip() {
         UI.review.querySelector(".ip-explanations-toggle")?.focus();
       } }, el("span", { class: "ip-toggle-track", "aria-hidden": "true" },
         el("span", { class: "ip-toggle-thumb" }, el("span", { class: "ip-toggle-tick" })))),
-    !screenPreview && el("button", {type: "button", class: "ip-close-game", title: "Close game",
+    el("button", {type: "button", class: "ip-close-game", title: "Close game",
       "aria-label": "Close game", onclick: closeReviewGame}, icon("close")));
 }
 /* ---------------- Coach personalities ----------------
