@@ -119,7 +119,7 @@ test('custom SF18 estimates still reject stale models, invalid scores and setup-
   }
 });
 
-for (const design of ['original', 'pages', 'dials', 'phases', 'phases2', 'phases-modern', 'phases-modern-v2']) {
+for (const design of ['original', 'pages', 'dials', 'phases', 'phases2', 'phases-modern', 'phases-modern-v2', 'phases-compact']) {
   test(`${design}: a custom-settings analysis renders scores and restores them from the library`, async t => {
     const a = app(t), S = loadGame(a, pgn);
     S.players.w.rating = S.players.b.rating = 1500;

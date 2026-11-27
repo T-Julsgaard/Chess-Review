@@ -5202,7 +5202,7 @@ function renderMoveQuality(sides, rows) {
   // Move quality has one design, the category distribution. (The Original overview
   // keeps Old's compact breakdown on its single page.)
   const design = panelDesign('accuracyQuality', S.settings);
-  const modern = ['phases-modern', 'phases-modern-v2'].includes(panelDesign('accuracy', S.settings));
+  const modern = MODERN_ACCURACY_DESIGNS.includes(panelDesign('accuracy', S.settings));
   const content = el('div', {class: 'acc-quality quality-distribution', 'data-quality-design': design},
     !modern ? el('div', {class: 'quality-summary'},
       el('div', {class: 'quality-totals'},
@@ -5415,10 +5415,13 @@ function renderModernAdvanced(sides, busy) {
   ]);
   return mount();
 }
+// Modern overviews share their Quality and Advanced pages. "Default version 2"
+// (phases-compact) always uses the compact overview that short panels get.
+const MODERN_ACCURACY_DESIGNS = ['phases-modern', 'phases-modern-v2', 'phases-compact'];
 function renderStats() {
   const design = panelDesign('accuracy', S.settings);
   const phaseReport2 = design === 'phases2';
-  const phaseModern = design === 'phases-modern' || design === 'phases-modern-v2';
+  const phaseModern = MODERN_ACCURACY_DESIGNS.includes(design);
   const phaseReport = design === 'phases' || phaseReport2 || phaseModern;
   const reveal = design === 'reveal' || phaseReport;
   const revealKey = JSON.stringify([design, S.batchGen, S.meSide, S.acc, S.calibrated?.w.rating, S.calibrated?.b.rating, S.gameStats]);
@@ -5501,7 +5504,7 @@ function renderStats() {
   }
   if (livePhases) content.querySelector('.acc-phases,.phase-report')?.replaceWith(livePhases);
   const fitPage = phaseModern && page < 2;
-  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : '') + (design === 'phases-modern-v2' ? ' accuracy-phase-modern-v2' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
+  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : '') + (design === 'phases-modern-v2' ? ' accuracy-phase-modern-v2' : '') + (design === 'phases-compact' ? ' accuracy-phase-compact' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
     accuracyPager(),
     el('div', {class: 'panel-body acc-page' + (fitPage ? ' acc-fit-page' : '') + (page === 0 ? ' acc-page-overview' : phaseModern ? page === 1 ? ' acc-page-quality' : ' acc-page-advanced' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
       'aria-labelledby': 'accuracy-tab-' + page}, ...(fitPage ? [el('div', {class: 'acc-fit-content'}, players, content)] : [players, content]))));
@@ -5536,15 +5539,26 @@ function scheduleAccuracyFit() {
     page.classList.remove('acc-fit-scroll');
     content.style.removeProperty('--q-row');
     content.style.removeProperty('--acc-dial');
+    content.style.removeProperty('--acc-room');
+    const phaseOverview = page.classList.contains('acc-page-overview') && content.querySelector('.phase-overview');
+    // Default version 2 uses the compact arrangement at every size, with
+    // full-size dials until the panel runs short.
+    const alwaysCompact = phaseOverview && page.closest('.accuracy-phase-compact');
+    if (alwaysCompact) {
+      content.classList.add('acc-compact');
+      content.style.setProperty('--acc-dial', ACC_DIAL_MAX + 'px');
+      if (fitCompactRoom(content, available) && page.scrollHeight <= page.clientHeight) return;
+    }
     if (page.scrollHeight <= page.clientHeight) return;
     // Short panels (laptops, scaled displays) first switch to a compact
     // arrangement of the same figures, so they stay readable at full size.
     if (page.classList.contains('acc-page-quality') && fitQualityRows(page, content)
       && page.scrollHeight <= page.clientHeight) return;
-    if (page.classList.contains('acc-page-overview') && content.querySelector('.phase-overview')) {
+    if (phaseOverview) {
       content.classList.add('acc-compact');
       if (fitAccuracyDials(page, content)) return;
       content.classList.add('acc-compact-tight');
+      if (alwaysCompact) fitCompactRoom(content, available);
       if (page.scrollHeight <= page.clientHeight) return;
     }
     // Quality's category labels stay legible: past QUALITY_ZOOM_MIN the list
@@ -5573,6 +5587,29 @@ function fitAccuracyDials(page, content) {
     size = Math.max(ACC_DIAL_MIN, Math.floor(Math.min(size, dial.offsetHeight) - over));
   }
   return page.scrollHeight <= page.clientHeight;
+}
+// Default version 2 on taller panels: its rows and figures grow into part of the
+// spare height (--acc-room, 0 to 1, read by panel-designs.css). Whatever is left
+// is shared below the names and between the sections, as in Default.
+function fitCompactRoom(content, available) {
+  const overview = content.querySelector('.phase-overview');
+  // Measure the content's own layout height (not stretched to the panel). It grows
+  // almost linearly with the room; text rounding can add a pixel, so check.
+  const natural = room => {
+    content.style.setProperty('--acc-room', String(Math.max(0, Math.floor(room * 1000) / 1000)));
+    return content.offsetHeight;
+  };
+  content.style.flexGrow = overview.style.flexGrow = '0';
+  const low = natural(0), high = natural(1), slope = Math.max(1, high - low);
+  let room = low > available ? 0 : Math.min(1, (available - low) / slope);
+  for (let i = 0, height = natural(room); i < 4 && room > 0 && height > available; i++) {
+    room = Math.max(0, room - (height - available + .5) / slope);
+    height = natural(room);
+  }
+  content.style.flexGrow = overview.style.flexGrow = '';
+  if (room > 0) return true;
+  content.style.removeProperty('--acc-room');
+  return low <= available;
 }
 // Zooming the whole Quality list made its text unreadable in short panels
 // (6–8px at a 1080p screen with 150% scaling). Instead, tighten the rows so they

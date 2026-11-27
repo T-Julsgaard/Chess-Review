@@ -304,6 +304,16 @@
 .stage .accuracy-phase-modern .acc-compact .phase-rating { padding-top: 6px; }
 .stage .accuracy-phase-modern .acc-compact .phase-rating > .acc-elo-label { font-size: 10px; line-height: 1.15; }
 .stage .accuracy-phase-modern .acc-compact .phase-rating-values .acc-elo { font-size: 18px; text-align: center; }
+/* Default version 2 keeps the compact arrangement at every size. On taller panels
+   its rows and figures grow into part of the spare height: --acc-room runs from 0
+   (the laptop size above) to 1, set by fitCompactRoom. */
+.stage .accuracy-phase-compact .acc-compact .phase-summary-label { font-size: calc(9.5px + 1.5px * var(--acc-room, 0)); }
+.stage .accuracy-phase-compact .acc-compact .phase-report { gap: calc(5px + 5px * var(--acc-room, 0)); }
+.stage .accuracy-phase-compact .acc-compact .phase-report-name { font-size: calc(11px + 1px * var(--acc-room, 0)); }
+.stage .accuracy-phase-compact .acc-compact .phase-report-cell { padding-block: calc(5px + 8px * var(--acc-room, 0)); }
+.stage .accuracy-phase-compact .acc-compact .phase-report-score { font-size: calc(18px + 4px * var(--acc-room, 0)); }
+.stage .accuracy-phase-compact .acc-compact .phase-rating { padding-top: calc(6px + 6px * var(--acc-room, 0)); }
+.stage .accuracy-phase-compact .acc-compact .phase-rating-values .acc-elo { font-size: calc(18px + 5px * var(--acc-room, 0)); }
 /* The shortest windows (1080p at 150% with bookmarks): the dials keep their
    figures without rings, and every row tightens. */
 .stage .accuracy-phase-modern .acc-compact-tight .acc-players { margin-bottom: 2px; }
@@ -317,6 +327,17 @@
 .stage .accuracy-phase-modern .acc-compact-tight .phase-report-score { font-size: 16px; }
 .stage .accuracy-phase-modern .acc-compact-tight .phase-rating { padding-top: 3px; }
 .stage .accuracy-phase-modern .acc-compact-tight .phase-rating-values .acc-elo { font-size: 16px; }
+/* Default version 2 keeps its names the size they are on Quality and Advanced, and
+   grows the tightened rows back towards the compact size as room allows. */
+.stage .accuracy-phase-compact .acc-compact-tight .acc-player { padding-block: 5px; }
+.stage .accuracy-phase-compact .acc-compact-tight .phase-overview { gap: calc(3px + 3px * var(--acc-room, 0)); }
+.stage .accuracy-phase-compact .acc-compact-tight .acc-dial { height: calc(26px + 8px * var(--acc-room, 0)); }
+.stage .accuracy-phase-compact .acc-compact-tight .phase-overall-values .acc-val { font-size: calc(21px + 5px * var(--acc-room, 0)); }
+.stage .accuracy-phase-compact .acc-compact-tight .phase-report { gap: calc(3px + 2px * var(--acc-room, 0)); }
+.stage .accuracy-phase-compact .acc-compact-tight .phase-report-cell { padding-block: calc(2px + 3px * var(--acc-room, 0)); }
+.stage .accuracy-phase-compact .acc-compact-tight .phase-report-score { font-size: calc(16px + 2px * var(--acc-room, 0)); }
+.stage .accuracy-phase-compact .acc-compact-tight .phase-rating { padding-top: calc(3px + 3px * var(--acc-room, 0)); }
+.stage .accuracy-phase-compact .acc-compact-tight .phase-rating-values .acc-elo { font-size: calc(16px + 2px * var(--acc-room, 0)); }
 /* Past its legible minimum (the shortest windows only), Quality scrolls quietly:
    no scroll bar, a fade where the list continues. */
 .stage .mod .accuracy-panel .acc-fit-page.acc-fit-scroll { overflow-y: auto; scrollbar-width: none;

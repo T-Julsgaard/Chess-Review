@@ -86,7 +86,7 @@ test('one retained liquid rail replaces both old controls across all shared page
   const a = review(t), doc = a.dom.window.document;
   const before = JSON.stringify({idx: a.state.idx, layout: a.state.layout, acc: a.state.acc});
   const rail = doc.querySelector('.acc-navigation');
-  for (const design of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-modern', 'phases-modern-v2']) {
+  for (const design of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-modern', 'phases-modern-v2', 'phases-compact']) {
     await a.call('setSetting', 'accuracyDesign', design); a.call('setAccuracyPage', 0);
     for (const next of [1, 2, 0]) {
       const button = doc.querySelector('#accuracy-tab-' + next);
